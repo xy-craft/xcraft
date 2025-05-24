@@ -1,0 +1,74 @@
+<!-- templates/navbar.html -->
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container">
+        <a class="navbar-brand" href="/">『 Xcraft 』</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav me-auto">
+                {% if admin_mode %}
+                <!-- 后台模式的导航项 -->
+                <li class="nav-item">
+                    <a class="nav-link" href="/admin/">面板</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/admin/category/OI">OI 管理</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/admin/category/文化课">文化课管理</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/admin/category/休闲娱乐">娱乐管理</a>
+                </li>
+                {% else %}
+                <!-- 前台模式的导航项 -->
+                <li class="nav-item">
+                    <a class="nav-link" href="/">首页</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/category/OI">OI 学习</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/category/文化课">文化课学习</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/category/休闲娱乐">休闲娱乐</a>
+                </li>
+                {% endif %}
+            </ul>
+            <ul class="navbar-nav">
+                {% if current_user.is_authenticated %}
+                <!-- 动态显示后台切换按钮 -->
+                {% if request.path.startswith('/admin') %}
+                <li class="nav-item">
+                    <a class="nav-link" href="/">
+                        <i class="bi bi-house-door"></i> 退出后台
+                    </a>
+                </li>
+                {% else %}
+                {% if current_user.is_admin %}
+                <li class="nav-item">
+                    <a class="nav-link" href="/admin/">
+                        <i class="bi bi-terminal"></i> 进入后台
+                    </a>
+                </li>
+                {% endif %}
+                {% endif %}
+                <li class="nav-item">
+                    <a class="nav-link" href="/logout">
+                        <i class="bi bi-box-arrow-right"></i> 退出
+                    </a>
+                </li>
+                {% else %}
+                <li class="nav-item">
+                    <a class="nav-link" href="/login">登录</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/register">注册</a>
+                </li>
+                {% endif %}
+            </ul>
+        </div>
+    </div>
+</nav>

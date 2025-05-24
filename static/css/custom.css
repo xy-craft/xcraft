@@ -1,0 +1,147 @@
+/* static/css/custom.css */
+/* 基础样式 */
+body {
+    background-color: #f8f9fa;
+}
+
+/* Markdown内容样式 */
+.markdown-content {
+    line-height: 1.8;
+    font-size: 16px;
+    color: #333;
+}
+
+.markdown-content h1, 
+.markdown-content h2, 
+.markdown-content h3 {
+    margin-top: 1.5em;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 0.3em;
+}
+
+.markdown-content code {
+    background-color: #f3f3f3;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: Monaco, Consolas, "Courier New", monospace;
+}
+
+.markdown-content pre {
+    background-color: #f8f9fa;
+    padding: 15px;
+    border-radius: 5px;
+    overflow-x: auto;
+}
+
+.markdown-content pre code {
+    background-color: transparent;
+    padding: 0;
+    font-size: 14px;
+}
+
+.markdown-content blockquote {
+    border-left: 4px solid #ddd;
+    margin: 1em 0;
+    padding: 0 1em;
+    color: #666;
+}
+
+.markdown-content table {
+    border-collapse: collapse;
+    margin: 1em 0;
+    width: 100%;
+}
+
+.markdown-content th,
+.markdown-content td {
+    border: 1px solid #ddd;
+    padding: 8px;
+}
+
+.markdown-content th {
+    background-color: #f8f9fa;
+}
+
+/* MathJax字体覆盖 */
+.MathJax {
+    font-family: Times New Roman, serif !important;
+}
+
+/* 自定义按钮样式 */
+.btn-post {
+    width: 120px;
+    margin: 10px;
+}
+
+/* 调整导航项间距 */
+.navbar-nav .nav-item {
+    margin-right: 1.5rem;
+}
+
+/* 移动端优化 */
+@media (max-width: 992px) {
+    .navbar-collapse {
+        padding-top: 1rem;
+    }
+    .navbar-nav .nav-item {
+        margin-right: 0;
+        margin-bottom: 0.5rem;
+    }
+}
+
+/* 欢迎板块样式 */
+.welcome-section {
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    border-left: 4px solid #0d6efd;
+}
+
+.welcome-section h1 {
+    color: #2c3e50;
+    font-size: 2.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.welcome-section p {
+    font-size: 1.1rem;
+    line-height: 1.8;
+}
+
+.welcome-section ul {
+    padding-left: 2rem;
+}
+
+.welcome-section a {
+    color: #0d6efd;
+    text-decoration: none;
+    transition: all 0.3s;
+}
+
+.welcome-section a:hover {
+    color: #0a58ca;
+    text-decoration: underline;
+}
+
+/* 所有按钮统一高度 */
+.btn {
+    padding: 6px 12px;
+    font-size: 13px;
+}
+
+/* 确保编辑器容器可见 */
+#editor-container {
+    min-height: 600px;
+    background: #fff;
+    border-radius: 4px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+/* 修复预览区域样式 */
+#preview-container {
+    padding: 1rem;
+    overflow-y: auto;
+}
+
+/* 强制显示光标 */
+.mdp-editor {
+    caret-color: #333 !important;
+}

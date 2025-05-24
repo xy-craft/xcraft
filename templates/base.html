@@ -1,0 +1,80 @@
+<!-- templates/base.html -->
+<!DOCTYPE html>
+<html lang="zh-CN">
+<style>
+    /* 强制所有页面使用相同滚动条策略 */
+    html {
+        overflow-y: scroll;
+        /* 始终预留滚动条空间 */
+        scrollbar-gutter: stable;
+        /* 现代浏览器支持 */
+    }
+</style>
+
+<head>
+    <!-- 修改 base.html 的图标引入方式 -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code&display=swap" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/bootstrap-icons/1.11.0/font/bootstrap-icons.min.css" rel="stylesheet">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}xy's blog{% endblock %}</title>
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.3/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/custom.css') }}">
+</head>
+
+<body>
+    {% include 'navbar.html' %}
+
+    <main class="container mt-4">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        {% for category, message in messages %}
+        <div class="alert alert-{{ category }} alert-dismissible fade show">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+        {% endfor %}
+        {% endif %}
+        {% endwith %}
+
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- 脚本加载顺序非常重要 -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- 在 base.html 中替换为国内CDN -->
+    <script src="https://cdn.bootcdn.net/ajax/libs/js-polyfills/0.1.42/polyfill.min.js"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="{{ url_for('static', filename='js/mathjax.js') }}"></script>
+
+    <!-- 通用 MathJax 初始化 -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // 初始化 MathJax 并监听内容变化
+            MathJax.startup.document.state(0).document.options.elements.push({
+                processEscapes: true,
+                ignoreHtmlClass: 'tex2jax_ignore',
+                processHtmlClass: 'tex2jax_process'
+            });
+
+            // 首次渲染
+            MathJax.typesetPromise().catch(err => {
+                console.log('MathJax initial typeset error:', err);
+            });
+
+            // 监听动态内容加载
+            new MutationObserver(() => {
+                MathJax.typesetPromise();
+            }).observe(document.body, {
+                childList: true,
+                subtree: true
+            });
+        });
+    </script>
+
+    {% block scripts %}{% endblock %}
+</body>
+
+</html>

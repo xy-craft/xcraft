@@ -1,0 +1,32 @@
+<!-- templates/post.html -->
+{% extends "base.html" %}
+
+{% block title %}{{ post.title }} - 我的博客{% endblock %}
+
+{% block content %}
+<article class="mb-5">
+    <h1 class="mb-4">{{ post.title }}</h1>
+    <div class="text-muted small mb-4">
+        分类：{{ post.category }} | 
+        作者：{{ post.author.username }} | 
+        发布于：{{ post.created_at.strftime('%Y-%m-%d %H:%M') }}
+    </div>
+    <div class="markdown-content tex2jax_process">
+        {{ content|safe }}
+    </div>
+</article>
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    MathJax.typesetPromise().catch(function(err) {
+        console.log('MathJax Typeset Error:', err);
+    });
+    
+    // 动态内容加载后重新渲染
+    MathJax.typesetPromise();
+});
+</script>
+{% endblock %}
