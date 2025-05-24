@@ -5,9 +5,7 @@
       "src": "app.py",
       "use": "@vercel/python",
       "config": {
-        "maxLambdaSize": "15mb",
-        "includeFiles": "templates/**",
-        "runtime": "python-3.9"
+        "includeFiles": "static/**/*, templates/**/*, database/**/*"
       }
     }
   ],
