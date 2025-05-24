@@ -1,5 +1,6 @@
 # app.py
 
+import os
 from flask import Flask, render_template, request, redirect, url_for, abort
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required, current_user
@@ -8,7 +9,9 @@ import markdown2
 from functools import wraps
 import markdown
 
-app = Flask(__name__)
+app = Flask(__name__, 
+          static_folder=os.path.abspath("static"),
+          template_folder=os.path.abspath("templates"))
 app.config.from_pyfile('config.py')
 db = SQLAlchemy(app)
 
