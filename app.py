@@ -296,3 +296,13 @@ def admin_redirect():
 def upload_file():
     # 这里实现文件上传逻辑
     pass
+
+
+
+
+
+
+
+
+# 在文件最后添加
+application = app
