@@ -1,136 +1,51 @@
 <!-- templates/admin/post_edit.html -->
 {% extends "admin/base.html" %}
 
-{% block admin_content %}
+{% block admin_content %} {# 注意这里要匹配管理后台的块 #}
 <div class="container">
+    <!-- 动态标题（新建/编辑） -->
     <h2 class="mb-4">{% if post %}编辑文章{% else %}新建文章{% endif %}</h2>
-    
-    <!-- 两栏布局容器 -->
-    <div class="row g-4">
-        <!-- 左侧编辑区 -->
-        <div class="col-md-6">
-            <div class="card h-100 shadow-sm">
-                <div class="card-body p-0">
-                    <div id="editor-container" style="height: 600px"></div>
-                </div>
-            </div>
-        </div>
 
-        <!-- 右侧预览区（由编辑器自动生成） -->
-        <div class="col-md-6">
-            <div class="card h-100 shadow-sm">
-                <div class="card-body">
-                    <div id="preview-container" style="height: 600px; overflow: auto"></div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- 隐藏的文本域 -->
     <form method="POST">
-        <textarea name="content" id="editor-content" hidden></textarea>
-        
-        <!-- 其他表单字段 -->
-        <div class="row mt-4">
-            <div class="col-md-9">
-                <div class="mb-3">
-                    <input type="text" 
-                           name="title" 
-                           class="form-control form-control-lg" 
-                           placeholder="文章标题"
-                           value="{{ post.title if post }}" 
-                           required>
-                </div>
-                
-                <div class="mb-3">
-                    <select name="category" class="form-select" required>
-                        <option value="OI" {% if post and post.category == 'OI' %}selected{% endif %}>OI学习</option>
-                        <option value="文化课" {% if post and post.category == '文化课' %}selected{% endif %}>文化课学习</option>
-                        <option value="休闲娱乐" {% if post and post.category == '休闲娱乐' %}selected{% endif %}>休闲娱乐</option>
-                    </select>
-                </div>
-            </div>
-            
-            <div class="col-md-3">
-                <div class="d-grid gap-2">
-                    <button type="submit" class="btn btn-primary btn-lg">
-                        {{ '保存修改' if post else '发布文章' }}
-                    </button>
-                </div>
-            </div>
+        <!-- 标题字段 -->
+        <div class="mb-3">
+            <label class="form-label">标题</label>
+            <input type="text" name="title" class="form-control" value="{{ post.title if post }}" required>
+        </div>
+
+        <!-- 分类选择 -->
+        <div class="mb-3">
+            <label class="form-label">分类</label>
+            <select name="category" class="form-select" required>
+                <option value="OI" {% if post and post.category=='OI' %}selected{% endif %}>
+                    OI 学习
+                </option>
+                <option value="文化课" {% if post and post.category=='文化课' %}selected{% endif %}>
+                    文化课学习
+                </option>
+                <option value="休闲娱乐" {% if post and post.category=='休闲娱乐' %}selected{% endif %}>
+                    休闲娱乐
+                </option>
+            </select>
+        </div>
+
+        <!-- 内容编辑区 -->
+        <div class="mb-3">
+            <label class="form-label">内容（Markdown格式）</label>
+            <textarea name="content" class="form-control" rows="15" required>{{ post.content if post }}</textarea>
+        </div>
+
+        <!-- 提交按钮 -->
+        <div class="d-flex gap-2">
+            <button type="submit" class="btn btn-primary">
+                {% if post %}保存修改{% else %}发布文章{% endif %}
+            </button>
+            {% if post.id %} {# 只有当文章存在id时才显示返回链接 #}
+            <a href="{{ url_for('admin_show_post', post_id=post.id) }}" class="btn btn-outline-secondary">
+                返回文章
+            </a>
+            {% endif %}
         </div>
     </form>
 </div>
-{% endblock %}
-
-{% block styles %}
-{{ super() }}
-<link href="{{ url_for('static', filename='css/markdown-palettes/MarkdownPalettes.css') }}" rel="stylesheet">
-<style>
-    /* 自定义编辑器样式 */
-    .mdp-editor {
-        border-right: 1px solid #dee2e6 !important;
-        border-radius: 8px 0 0 8px;
-    }
-    .mdp-preview {
-        border-left: none !important;
-        border-radius: 0 8px 8px 0;
-    }
-</style>
-{% endblock %}
-
-{% block scripts %}
-{{ super() }}
-<!-- 必需依赖 -->
-<script src="https://cdn.jsdelivr.net/npm/vue@2.7.14/dist/vue.min.js"></script>
-<script src="{{ url_for('static', filename='js/markdown-palettes/markdown-palettes.min.js') }}"></script>
-
-<script>
-document.addEventListener('DOMContentLoaded', () => {
-    const container = document.getElementById('editor-container');
-    const textarea = document.getElementById('editor-content');
-    
-    if (!container || !textarea) {
-        console.error('Editor container not found');
-        return;
-    }
-
-    // 安全获取初始内容
-    const initialContent = textarea.value || '';
-    
-    try {
-        const editor = new MarkdownPalettes(container, {
-            textarea: textarea,
-            initialValue: initialContent,
-            height: '600px',
-            splitView: true, // 启用分栏
-            previewContainer: '#preview-container', // 指定预览容器
-            toolbar: [
-                'heading', 'bold', 'italic', 'strikethrough',
-                '|', 'list', 'link', 'image',
-                '|', 'code', 'table', 'math'
-            ]
-        });
-
-        // 自动聚焦输入区域
-        setTimeout(() => {
-            const editorElement = container.querySelector('.mdp-editor');
-            if (editorElement) editorElement.focus();
-        }, 300);
-        
-    } catch (error) {
-        console.error('Editor init failed:', error);
-        // 显示错误提示
-        container.innerHTML = `
-            <div class="alert alert-danger">
-                <h4>编辑器加载失败</h4>
-                <p>${error.message}</p>
-                <button onclick="location.reload()" class="btn btn-sm btn-secondary">
-                    重新加载页面
-                </button>
-            </div>
-        `;
-    }
-});
-</script>
 {% endblock %}

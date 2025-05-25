@@ -1,6 +1,5 @@
 # app.py
 
-import os
 from flask import Flask, render_template, request, redirect, url_for, abort
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required, current_user
@@ -9,9 +8,7 @@ import markdown2
 from functools import wraps
 import markdown
 
-app = Flask(__name__, 
-          static_folder=os.path.abspath("static"),
-          template_folder=os.path.abspath("templates"))
+app = Flask(__name__)
 app.config.from_pyfile('config.py')
 db = SQLAlchemy(app)
 
@@ -63,8 +60,6 @@ def admin_required(f):
         return f(*args, **kwargs)
     return decorated_function
 
-# 在 app.py 的适当位置（例如在路由定义之前）添加以下代码：
-
 # 自定义过滤器
 def datetimeformat(value, format='%Y-%m-%d %H:%M'):
     return value.strftime(format)
@@ -73,6 +68,8 @@ def datetimeformat(value, format='%Y-%m-%d %H:%M'):
 app.jinja_env.filters['datetimeformat'] = datetimeformat
 
 # 路由部分
+
+# 首页路由
 @app.route('/')
 def index():
     welcome_content = """
@@ -111,7 +108,6 @@ def show_post(post_id):
     return render_template('post.html', post=post, content=html_content)
 
 # dashboard
-
 @app.route('/admin/')
 @login_required
 @admin_required
@@ -153,6 +149,13 @@ def admin_dashboard():
                          latest_user=latest_user,
                          monthly_posts=chart_monthly_posts)
 
+# 后台首页重定向
+@app.route('/admin')
+@login_required
+@admin_required
+def admin_redirect():
+    return redirect(url_for('admin_dashboard'))
+
 # 后台分类管理路由
 @app.route('/admin/category/<category>')
 @login_required
@@ -162,6 +165,17 @@ def admin_category(category):
     return render_template('admin/category.html', 
                          posts=posts,
                          category=category)
+
+# 后台文章展示路由
+@app.route('/admin/post/<int:post_id>')
+@login_required
+@admin_required
+def admin_show_post(post_id):
+    post = Post.query.get_or_404(post_id)
+    html_content = markdown2.markdown(post.content, extras=["fenced-code-blocks", "tables", "latex"])
+    return render_template('admin/post.html', 
+                         post=post, 
+                         content=html_content)
 
 # 后台文章删除路由
 @app.route('/admin/post/delete/<int:post_id>')
@@ -186,6 +200,73 @@ def admin_edit_post(post_id):
         db.session.commit()
         return redirect(url_for('admin_category', category=post.category))
     return render_template('admin/post_edit.html', post=post)
+
+# 后台文章路由列表
+@app.route('/admin/posts')
+@login_required
+@admin_required
+def manage_posts():
+    posts = Post.query.order_by(Post.created_at.desc()).all()
+    return render_template('admin/post_list.html', posts=posts)
+
+# 新建文章EmptyPost的类定义
+class EmptyPost:
+    """用于新建文章的默认空值对象"""
+    def __init__(self):
+        self.id = None       # 添加id属性
+        self.title = ""
+        self.content = ""
+        self.category = "OI" # 设置默认分类
+        self.created_at = datetime.utcnow()  # 可选添加
+
+# 新建文章
+@app.route('/admin/post/new', methods=['GET', 'POST'])
+@login_required
+@admin_required
+def new_post():
+    if request.method == 'POST':
+        # 保持原有提交逻辑不变
+        title = request.form['title']
+        content = request.form['content']
+        category = request.form['category']
+        
+        new_post = Post(
+            title=title,
+            content=content,
+            category=category,
+            user_id=current_user.id
+        )
+        db.session.add(new_post)
+        db.session.commit()
+        return redirect(url_for('manage_posts'))
+    
+    # 获取默认分类（新增代码）
+    default_category = request.args.get('default_category', 'OI')  # 从URL参数获取
+    
+    # 创建带默认分类的空文章对象（修改此处）
+    empty_post = EmptyPost()
+    empty_post.category = default_category  # 动态设置默认分类
+    
+    return render_template(
+        'admin/post_edit.html', 
+        post=empty_post,
+        is_edit_mode=False
+    )
+
+# 删除文章
+@app.route('/admin/post/delete/<int:post_id>')
+@login_required
+@admin_required
+def delete_post(post_id):
+    post = Post.query.get_or_404(post_id)
+    db.session.delete(post)
+    db.session.commit()
+    return redirect(url_for('manage_posts'))
+
+if __name__ == '__main__':
+    with app.app_context():
+        db.create_all()
+    app.run(debug=True)
 
 # 用户认证
 @app.route('/login', methods=['GET', 'POST'])
@@ -230,82 +311,9 @@ def logout():
     logout_user()
     return redirect(url_for('index'))
 
-# 管理功能
-@app.route('/admin/posts')
-@login_required
-@admin_required
-def manage_posts():
-    posts = Post.query.order_by(Post.created_at.desc()).all()
-    return render_template('admin/post_list.html', posts=posts)
-
-class EmptyPost:
-    """用于新建文章的默认空值对象"""
-    def __init__(self):
-        self.title = ""
-        self.content = ""
-        self.category = ""
-
-@app.route('/admin/post/new', methods=['GET', 'POST'])
-@login_required
-@admin_required
-def new_post():
-    if request.method == 'POST':
-        # 保持原有提交逻辑不变
-        title = request.form['title']
-        content = request.form['content']
-        category = request.form['category']
-        
-        new_post = Post(
-            title=title,
-            content=content,
-            category=category,
-            user_id=current_user.id
-        )
-        db.session.add(new_post)
-        db.session.commit()
-        return redirect(url_for('manage_posts'))
-    
-    # GET请求时传递初始化对象
-    return render_template(
-        'admin/post_edit.html', 
-        post=EmptyPost(),  # 传递实例而非类
-        is_edit_mode=False  # 添加模式标识
-    )
-
-@app.route('/admin/post/delete/<int:post_id>')
-@login_required
-@admin_required
-def delete_post(post_id):
-    post = Post.query.get_or_404(post_id)
-    db.session.delete(post)
-    db.session.commit()
-    return redirect(url_for('manage_posts'))
-
-if __name__ == '__main__':
-    with app.app_context():
-        db.create_all()
-    app.run(debug=True)
-
-# 新增后台首页重定向
-@app.route('/admin')
-@login_required
-@admin_required
-def admin_redirect():
-    return redirect(url_for('admin_dashboard'))
-
 @app.route('/upload', methods=['POST'])  # 如果需要图片上传功能需要实现这个路由
 @login_required
 @admin_required
 def upload_file():
     # 这里实现文件上传逻辑
     pass
-
-
-
-
-
-
-
-
-# 在文件最后添加
-application = app

@@ -145,3 +145,50 @@ body {
 .mdp-editor {
     caret-color: #333 !important;
 }
+
+/* 调整文章正文的字体大小和行高 */
+.markdown-content {
+    font-size: 1.4rem;  /* 基础字体大小 */
+    line-height: 1.8;   /* 行高 */
+}
+
+/* 调整标题层级 */
+.markdown-content h1 {
+    font-size: 2.2rem;
+    margin: 2rem 0 1.5rem;
+}
+
+.markdown-content h2 {
+    font-size: 1.8rem;
+    margin: 1.8rem 0 1.2rem;
+}
+
+.markdown-content h3 {
+    font-size: 1.5rem;
+    margin: 1.5rem 0 1rem;
+}
+
+/* 调整段落文字 */
+.markdown-content p {
+    margin-bottom: 1.4rem;
+    font-size: 1.3rem;
+}
+
+/* 调整代码块样式 */
+.markdown-content pre {
+    font-size: 0.95rem;
+    padding: 1.2rem;
+    border-radius: 8px;
+}
+
+/* 调整列表文字 */
+.markdown-content ul,
+.markdown-content ol {
+    font-size: 1.1rem;
+    margin-bottom: 1.2rem;
+}
+
+/* 数学公式容器调整 */
+.MathJax_Display {
+    margin: 1.5rem 0 !important;
+}
