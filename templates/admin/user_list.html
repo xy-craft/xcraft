@@ -1,0 +1,63 @@
+<!-- templates/admin/user_list.html -->
+{% extends "admin/base.html" %}
+
+{% block admin_content %}
+<div class="container">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="mb-0">用户管理</h2>
+         <a href="#" class="btn btn-success btn-sm py-1">
+            <i class="bi bi-plus-lg"></i> 新建用户（暂不可用）
+        </a> 
+    </div>
+
+    {% for user in users %}
+    <div class="card mb-3">
+        <div class="card-body">
+            <div class="d-flex justify-content-between align-items-center">
+                <!-- 左侧用户信息 -->
+                <div class="d-flex flex-column me-3">
+                    <h5 class="card-title mb-2">
+                        {{ user.username }}
+                        {% if user.is_admin %}
+                        <span class="badge bg-danger ms-2" style="position: relative; top: -2px; left: -0.3em">管理员</span>
+                        {% endif %}
+                    </h5>
+                    <div class="text-muted small">
+                        UID: {{ user.id }} |
+                        注册时间: {{ user.reg_date|datetimeformat }} |
+                        文章数: {{ user.posts|length }}
+                    </div>
+                </div>
+
+                <!-- 右侧操作按钮 -->
+                <div class="d-flex gap-2 align-items-center">
+                    <a href="{{ url_for('admin_user_detail', uid=user.id) }}" class="btn btn-primary btn-sm">
+                        <i class="bi bi-person-lines"></i>
+                        详情
+                    </a>
+                    <a href="{{ url_for('admin_edit_user', uid=user.id) }}" class="btn btn-warning btn-sm">
+                        <i class="bi bi-pencil"></i>
+                        编辑
+                    </a>
+                    {% if user.is_admin %}
+                    <a href="#" class="btn btn-secondary btn-sm disabled" title="管理员账户不可删除"
+                        style="pointer-events: none;">
+                        <i class="bi bi-trash"></i>
+                        删除
+                    </a>
+                    {% else %}
+                    <a href="{{ url_for('admin_delete_user', uid=user.id) }}" class="btn btn-danger btn-sm"
+                        onclick="return confirm('确定删除用户？')">
+                        <i class="bi bi-trash"></i>
+                        删除
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <div class="alert alert-warning">暂无用户</div>
+    {% endfor %}
+</div>
+{% endblock %}
