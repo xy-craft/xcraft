@@ -1,7 +1,7 @@
-<!-- templates/admin/post_edit.html -->
-{% extends "admin/base.html" %}
+<!-- templates/post_edit.html -->
+{% extends "base.html" %}
 
-{% block admin_content %} {# 注意这里要匹配管理后台的块 #}
+{% block content %}
 <div class="container">
     <!-- 动态标题（新建/编辑） -->
     <h2 class="mb-4">{% if post %}编辑文章{% else %}新建文章{% endif %}</h2>
@@ -41,7 +41,7 @@
                 {% if post %}保存修改{% else %}发布文章{% endif %}
             </button>
             {% if post.id %} {# 只有当文章存在id时才显示返回链接 #}
-            <a href="{{ url_for('admin_show_post', post_id=post.id) }}" class="btn btn-outline-secondary">
+            <a href="{{ url_for('show_post', post_id=post.id) }}" cl`ss="btn btn-outline-secondary">
                 返回文章
             </a>
             {% endif %}

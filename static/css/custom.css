@@ -192,3 +192,8 @@ body {
 .MathJax_Display {
     margin: 1.5rem 0 !important;
 }
+
+/* 定义多套颜色方案 */
+.badge-red { background-color: #dc3545; }
+.badge-blue { background-color: #0d6efd; }
+.badge-purple { background-color: #8e44ad; }

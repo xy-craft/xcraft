@@ -17,10 +17,12 @@
             <div class="card-body">
                 <!-- 用户ID字段 -->
                 <div class="mb-3">
-                    <label class="form-label">用户ID (UID)</label>
-                    <input type="number" class="form-control" name="uid" value="{{ user.uid }}" min="1" required>
+                    <label class="form-label">用户 ID (UID)</label>
+                    <input type="number" class="form-control" name="uid"
+                    min="1"
+                    placeholder="留空将保持当前UID：{{ user.id }}"> <!-- 添加提示 -->
                     <div class="form-text text-muted small">
-                        唯一用户标识符（必须为数字且≥1），修改后需确保唯一性
+                        当前UID: {{ user.id }}，修改需确保唯一性 <!-- 显示当前值 -->
                     </div>
                 </div>
 
@@ -47,32 +49,18 @@
                     </div>
                 </div>
 
+
+                <div class="mb-3 form-check">
+                    <input type="checkbox" class="form-check-input" id="can_post" name="can_post" {{ 'checked' if
+                        user.can_post }}>
+                    <label class="form-check-label" for="can_post">发表帖子权限</label>
+                </div>
+
                 <!-- 管理员权限开关 -->
                 <div class="mb-3 form-check">
                     <input type="checkbox" class="form-check-input" id="is_admin" name="is_admin" {{ 'checked' if
                         user.is_admin }}>
                     <label class="form-check-label" for="is_admin">管理员权限</label>
-                </div>
-                
-                <div class="mb-3">
-                    <label class="form-label">权限设置</label>
-                    <div class="form-check">
-                        <input type="checkbox" class="form-check-input" name="permissions" value="{{ PERMISSION_POST }}"
-                            id="perm_post" {{ 'checked' if user.has_permission(PERMISSION_POST) }}>
-                        <label class="form-check-label" for="perm_post">发布文章</label>
-                    </div>
-                    <div class="form-check">
-                        <input type="checkbox" class="form-check-input" name="permissions"
-                            value="{{ PERMISSION_MANAGE_POST }}" id="perm_manage_post" {{ 'checked' if
-                            user.has_permission(PERMISSION_MANAGE_POST) }}>
-                        <label class="form-check-label" for="perm_manage_post">管理文章</label>
-                    </div>
-                    <div class="form-check">
-                        <input type="checkbox" class="form-check-input" name="permissions"
-                            value="{{ PERMISSION_MANAGE_USER }}" id="perm_manage_user" {{ 'checked' if
-                            user.has_permission(PERMISSION_MANAGE_USER) }}>
-                        <label class="form-check-label" for="perm_manage_user">管理用户</label>
-                    </div>
                 </div>
 
                 <!-- 提交按钮 -->
@@ -93,5 +81,30 @@
             checkbox.disabled = this.checked;
             checkbox.checked = this.checked;
         });
+    });
+</script>
+
+<script>
+    document.querySelector('form').addEventListener('submit', function (e) {
+        const uidInput = document.querySelector('input[name="uid"]');
+
+        // 清空无效输入的警告
+        uidInput.setCustomValidity('');
+
+        // 处理留空逻辑
+        if (uidInput.value.trim() === '') {
+            // 移除必填验证提示
+            uidInput.removeAttribute('required');
+            // 设置空值标识
+            uidInput.value = '';
+        } else {
+            // 数值有效性验证
+            const uidValue = parseInt(uidInput.value);
+            if (uidValue < 1 || isNaN(uidValue)) {
+                uidInput.setCustomValidity('UID必须为正整数');
+                e.preventDefault();
+                uidInput.reportValidity();
+            }
+        }
     });
 </script>

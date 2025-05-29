@@ -18,8 +18,11 @@
                 <div class="d-flex flex-column me-3">
                     <h5 class="card-title mb-2">
                         {{ user.username }}
+                        {% if user.can_post %}
+                        <span class="badge badge-red ms-2" style="position: relative; top: -2px; left: -0.3em">管理员</span>
+                        {% endif %}
                         {% if user.is_admin %}
-                        <span class="badge bg-danger ms-2" style="position: relative; top: -2px; left: -0.3em">管理员</span>
+                        <span class="badge badge-purple ms-2" style="position: relative; top: -2px; left: -0.3em">超管</span>
                         {% endif %}
                     </h5>
                     <div class="text-muted small">

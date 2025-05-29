@@ -45,7 +45,7 @@ class User(db.Model, UserMixin):
     username = db.Column(db.String(20), unique=True, nullable=False)
     password = db.Column(db.String(255), nullable=False)
     is_admin = db.Column(db.Boolean, default=False)
-    permissions = db.Column(db.Integer, default=0)
+    can_post = db.Column(db.Boolean, default=False)
     reg_date = db.Column(db.DateTime, default=datetime.utcnow)
     posts = db.relationship('Post', backref='author', lazy=True)
 
@@ -60,6 +60,26 @@ class Post(db.Model):
     category = db.Column(db.String(20))
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    @classmethod
+    def get_min_available_id(cls):
+        """
+        获取最小的可用正整数ID
+        返回类型: int
+        """
+        # 递归生成数字序列查询
+        recursive_cte = text(f"""
+            WITH RECURSIVE sequence(x) AS (
+                SELECT 1
+                UNION ALL
+                SELECT x+1 FROM sequence
+                LIMIT (SELECT COALESCE(MAX(id)+1,1) FROM {cls.__tablename__})
+            )
+            SELECT MIN(x) FROM sequence
+            WHERE x NOT IN (SELECT id FROM {cls.__tablename__})
+        """)
+        
+        result = db.session.execute(recursive_cte).scalar()
+        return result or 1  # 处理空表情况
 
 # 新建文章EmptyPost的类定义
 class EmptyPost:
@@ -70,11 +90,6 @@ class EmptyPost:
         self.content = ""
         self.category = "OI" # 设置默认分类
         self.created_at = datetime.utcnow()  # 可选添加
-
-def has_permission(self, perm):
-    if self.is_admin:
-        return True
-    return (self.permissions & perm) == perm
 
 # 3. 实现UID查找逻辑
 def find_available_uid():
@@ -163,6 +178,16 @@ def admin_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
         if not current_user.is_admin:
+            abort(403)
+        return f(*args, **kwargs)
+    return decorated_function
+
+# 发表文章权限装饰器
+def post_edit_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if not current_user.is_authenticated or \
+           (not current_user.is_admin and not current_user.can_post):
             abort(403)
         return f(*args, **kwargs)
     return decorated_function
@@ -336,8 +361,6 @@ def manage_posts():
     posts = Post.query.order_by(Post.created_at.desc()).all()
     return render_template('admin/post_list.html', posts=posts)
 
-
-
 # 新建文章
 @app.route('/admin/post/new', methods=['GET', 'POST'])
 @login_required
@@ -368,6 +391,40 @@ def new_post():
     
     return render_template(
         'admin/post_edit.html', 
+        post=empty_post,
+        is_edit_mode=False
+    )
+
+# 新建文章
+@app.route('/post/new', methods=['GET', 'POST'])
+@login_required
+@post_edit_required
+def user_new_post():
+    if request.method == 'POST':
+        # 保持原有提交逻辑不变
+        title = request.form['title']
+        content = request.form['content']
+        category = request.form['category']
+        
+        new_post = Post(
+            title=title,
+            content=content,
+            category=category,
+            user_id=current_user.id
+        )
+        db.session.add(new_post)
+        db.session.commit()
+        return redirect(url_for('category', category=category))
+    
+    # 获取默认分类（新增代码）
+    default_category = request.args.get('default_category', 'OI')  # 从URL参数获取
+    
+    # 创建带默认分类的空文章对象（修改此处）
+    empty_post = EmptyPost()
+    empty_post.category = default_category  # 动态设置默认分类
+    
+    return render_template(
+        'post_edit.html', 
         post=empty_post,
         is_edit_mode=False
     )
@@ -404,89 +461,111 @@ def admin_user_detail(uid):
 
 # 后台用户编辑路由
 @app.route('/admin/user/edit/<int:uid>', methods=['GET', 'POST'])
+@login_required
+@admin_required
 def admin_edit_user(uid):
     user = User.query.get_or_404(uid)
     
     if request.method == 'POST':
-
-        # 基础字段更新
-        user.username = request.form['username']
-        user.is_admin = True if request.form.get('is_admin') == 'on' else False
-        
-        # 密码修改逻辑
-        new_password = request.form.get('new_password')
-        confirm_password = request.form.get('confirm_password')
-        
-        if new_password or confirm_password:
-            if new_password != confirm_password:
-                flash('两次输入的密码不一致', 'danger')
-                return redirect(url_for('admin_edit_user', uid=uid))
-                
-            if len(new_password) < 6:
-                flash('密码长度至少6个字符', 'danger')
-                return redirect(url_for('admin_edit_user', uid=uid))
-                
-            user.password = generate_password_hash(new_password)
-            flash('密码已更新', 'success')
-
-        # uid修改逻辑，开启事务
-        db.session.begin_nested()
-        
-        # 获取新旧UID
-        old_uid = user.id
-        new_uid = request.form.get('uid', type=int)
-        
-        # 验证新UID
-        if not new_uid or new_uid < 1:
-            raise ValueError("UID必须为正整数")
-            
-        if new_uid == old_uid:
-            raise ValueError("UID未变更")
-            
-        if User.query.get(new_uid):
-            raise ValueError("该UID已被占用")
-        
-        # 检查回收池是否包含新UID
-        if AvailableUID.query.get(new_uid):
-            # 从回收池移除新UID
-            db.session.execute(
-                text("DELETE FROM available_uids WHERE uid = :uid"),
-                {"uid": new_uid}
-            )
-        
-        # 更新所有关联数据（示例更新posts表）
-        Post.query.filter_by(user_id=old_uid).update(
-            {Post.user_id: new_uid},
-            synchronize_session=False
-        )
-        
-        # 将旧UID加入回收池
-        db.session.execute(
-            text("""
-                INSERT INTO available_uids (uid) 
-                SELECT :old_uid
-                WHERE NOT EXISTS (
-                    SELECT 1 FROM available_uids WHERE uid = :old_uid
-                )
-            """),
-            {"old_uid": old_uid}
-        )
-        
-        # 更新用户UID
-        user.id = new_uid
-        
-        # 更新其他字段
-        user.username = request.form['username']
-        user.is_admin = request.form.get('is_admin') == 'on'
-
         try:
-            db.session.commit()
-            flash('用户信息更新成功', 'success')
-            return redirect(url_for('admin_user_detail', uid=new_uid))
+            # 初始化修改标记
+            has_changes = False
+            new_uid = request.form.get('uid', type=int)  # 获取可能为None的值
+
+            # ==================== UID修改逻辑 ====================
+            if new_uid is not None:  # 仅当有输入值时处理
+                # 验证新UID有效性
+                if new_uid < 1:
+                    raise ValueError("UID必须为正整数")
+                    
+                if new_uid == user.id:
+                    raise ValueError("UID未变更")
+                    
+                if User.query.get(new_uid):
+                    raise ValueError("该UID已被占用")
+
+                # 开启嵌套事务处理UID修改
+                with db.session.begin_nested():
+                    old_uid = user.id
+                    
+                    # 处理UID回收池
+                    if AvailableUID.query.get(new_uid):
+                        db.session.execute(
+                            text("DELETE FROM available_uids WHERE uid = :uid"),
+                            {"uid": new_uid}
+                        )
+                    
+                    # 更新关联数据
+                    Post.query.filter_by(user_id=old_uid).update(
+                        {Post.user_id: new_uid},
+                        synchronize_session=False
+                    )
+                    
+                    # 回收旧UID
+                    db.session.execute(
+                        text("""
+                            INSERT INTO available_uids (uid) 
+                            SELECT :old_uid
+                            WHERE NOT EXISTS (
+                                SELECT 1 FROM available_uids WHERE uid = :old_uid
+                            )
+                        """),
+                        {"old_uid": old_uid}
+                    )
+                    
+                    # 执行UID修改
+                    user.id = new_uid
+                    has_changes = True
+
+            # ==================== 基础字段更新 ====================
+            # 用户名修改检测
+            if user.username != request.form['username']:
+                user.username = request.form['username']
+                has_changes = True
+
+            # 权限修改检测
+            new_admin_status = request.form.get('is_admin') == 'on'
+            if user.is_admin != new_admin_status:
+                user.is_admin = new_admin_status
+                has_changes = True
+
+            new_post_permission = request.form.get('can_post') == 'on'
+            if user.can_post != new_post_permission:
+                user.can_post = new_post_permission
+                has_changes = True
+
+            # ==================== 密码修改逻辑 ====================
+            new_password = request.form.get('new_password')
+            confirm_password = request.form.get('confirm_password')
             
+            if new_password or confirm_password:
+                if new_password != confirm_password:
+                    raise ValueError("两次输入的密码不一致")
+                    
+                if len(new_password) < 6:
+                    raise ValueError("密码长度至少6个字符")
+                    
+                user.password = generate_password_hash(new_password)
+                has_changes = True
+                flash('密码已更新', 'success')
+
+            # ==================== 提交事务 ====================
+            if has_changes:
+                db.session.commit()
+                flash('用户信息更新成功', 'success')
+            else:
+                flash('未检测到修改', 'info')
+
+            return redirect(url_for('admin_user_detail', uid=new_uid or user.id))
+            
+        except ValueError as ve:
+            db.session.rollback()
+            flash(f'操作失败: {str(ve)}', 'danger')
+            return redirect(url_for('admin_edit_user', uid=uid))
         except Exception as e:
             db.session.rollback()
-            flash(f'更新失败: {str(e)}', 'danger')
+            flash(f'系统错误: {str(e)}', 'danger')
+            return redirect(url_for('admin_edit_user', uid=uid))
 
     return render_template('admin/user_edit.html', user=user)
 
@@ -602,4 +681,4 @@ def upload_file():
 if __name__ == '__main__':
     with app.app_context():
         db.create_all()
-    app.run(debug=True, use_reloader=True)
+    app.run(debug=True)
