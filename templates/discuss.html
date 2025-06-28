@@ -1,7 +1,7 @@
 <!-- templates/discuss.html -->
 {% extends "base.html" %}
 
-{% block title %}讨论区 - Xcraft{% endblock %}
+{% block title %}{{ current_category }} - Xcraft{% endblock %}
 
 {% block content %}
 <div class="container">
@@ -19,126 +19,64 @@
     </div>
     
     <div class="row">
-        <!-- 左侧分类面板 (25%宽度) -->
-        <div class="col-md-3">
-            <div class="card mb-4">
-                <div class="card-header bg-light">
-                    <h5 class="mb-0">板块导航</h5>
-                </div>
-                <div class="card-body p-0">
-                    <ul class="list-group list-group-flush">
-                        {% for cat in categories %}
-                        <a href="{% if cat.id %}/category/{{ cat.id }}{% else %}/category/{% endif %}" 
-                           class="list-group-item list-group-item-action d-flex justify-content-between align-items-center {% if cat.active %}active{% endif %}">
-                           {{ cat.name }}
-                           <span class="badge bg-{% if cat.active %}light text-dark{% else %}secondary{% endif %} rounded-pill">{{ cat.count }}</span>
-                        </a>
-                        {% endfor %}
-                    </ul>
-                </div>
-            </div>
-            
-            <!-- 站务公告 -->
+        <!-- 左侧分类面板 -->
+        <div class="col-md-3 mb-4">
             <div class="card">
                 <div class="card-header bg-light">
-                    <h5 class="mb-0">站务公告</h5>
+                    <strong>板块导航</strong>
                 </div>
-                <div class="card-body">
-                    <ul class="list-group list-group-flush">
-                        <li class="list-group-item p-2">
-                            <a href="#" class="text-decoration-none">论坛使用规则</a>
-                        </li>
-                        <li class="list-group-item p-2">
-                            <a href="#" class="text-decoration-none">社区积分制度</a>
-                        </li>
-                        <li class="list-group-item p-2">
-                            <a href="#" class="text-decoration-none">反馈与建议</a>
-                        </li>
-                    </ul>
+                <div class="list-group list-group-flush">
+                    {% for cat in categories %}
+                    <a href="{% if cat.id %}/category/{{ cat.id }}{% else %}/category/{% endif %}" 
+                       class="list-group-item list-group-item-action d-flex justify-content-between align-items-center {% if cat.active %}active{% endif %}">
+                        {{ cat.name }}
+                        <span class="badge bg-secondary rounded-pill">{{ cat.count }}</span>
+                    </a>
+                    {% endfor %}
                 </div>
             </div>
         </div>
         
-        <!-- 右侧帖子列表 (75%宽度) -->
+        <!-- 右侧帖子列表 -->
         <div class="col-md-9">
-            <div class="card">
-                <div class="card-body p-0">
-                    <!-- 帖子列表 -->
-                    <div class="list-group list-group-flush">
-                        {% for post in posts %}
-                        <div class="list-group-item">
-                            <div class="d-flex justify-content-between align-items-start">
-                                <!-- 左侧内容 -->
-                                <div class="me-3 flex-grow-1">
-                                    <h5 class="mb-1">
-                                        <a href="{{ url_for('show_post', post_id=post.id) }}" class="text-decoration-none">
-                                            {{ post.title }}
-                                        </a>
-                                    </h5>
-                                    <div class="d-flex align-items-center small text-muted mt-2">
-                                        <span class="badge bg-secondary me-2">{{ post.category }}</span>
-                                        <span class="me-3">
-                                            <i class="bi bi-person"></i> {{ post.author.username }}
-                                        </span>
-                                        <span>
-                                            <i class="bi bi-clock"></i> {{ post.created_at.strftime('%Y-%m-%d %H:%M') }}
-                                        </span>
-                                    </div>
-                                </div>
-                                
-                                <!-- 右侧信息 -->
-                                <div class="d-flex flex-column align-items-end">
-                                    <div class="d-flex gap-2">
-                                        <span class="text-muted">
-                                            <i class="bi bi-chat"></i> 0
-                                        </span>
-                                        <span class="text-muted">
-                                            <i class="bi bi-eye"></i> 0
-                                        </span>
-                                    </div>
-                                </div>
+            {% for post in posts %}
+            <div class="card mb-3">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <!-- 左侧内容 -->
+                        <div class="d-flex flex-column me-3" style="width: 80%;">
+                            <h5 class="card-title mb-2">
+                                <a href="{{ url_for('show_post', post_id=post.id) }}" class="text-decoration-none">
+                                    {{ post.title }}
+                                </a>
+                            </h5>
+                            
+                            <div class="d-flex align-items-center text-muted small">
+                                <span class="badge bg-secondary me-2">
+                                    {% if post.category == 'OI' %}OI学习
+                                    {% elif post.category == 'study' %}文化课学习
+                                    {% elif post.category == 'relax' %}休闲娱乐
+                                    {% elif post.category == 'announce' %}站务板
+                                    {% else %}{{ post.category }}{% endif %}
+                                </span>
+                                <span class="me-2">作者：{{ post.author.username }}</span>
+                                <span>发布于：{{ post.created_at.strftime('%Y-%m-%d') }}</span>
                             </div>
                         </div>
-                        {% else %}
-                        <div class="list-group-item">
-                            <div class="text-center py-4 text-muted">
-                                <i class="bi bi-inbox" style="font-size: 2rem;"></i>
-                                <p class="mt-2 mb-0">该板块暂无文章</p>
-                            </div>
+                        
+                        <!-- 右侧信息 -->
+                        <div class="d-flex flex-column align-items-end justify-content-center">
+                            <a href="{{ url_for('show_post', post_id=post.id) }}" class="btn btn-outline-primary btn-sm">
+                                查看详情
+                            </a>
                         </div>
-                        {% endfor %}
                     </div>
-                    
-                    <!-- 分页控件 -->
-                    <nav class="p-3">
-                        <ul class="pagination justify-content-center mb-0">
-                            <li class="page-item disabled">
-                                <a class="page-link" href="#" tabindex="-1">上一页</a>
-                            </li>
-                            <li class="page-item active"><a class="page-link" href="#">1</a></li>
-                            <li class="page-item"><a class="page-link" href="#">2</a></li>
-                            <li class="page-item"><a class="page-link" href="#">3</a></li>
-                            <li class="page-item">
-                                <a class="page-link" href="#">下一页</a>
-                            </li>
-                        </ul>
-                    </nav>
                 </div>
             </div>
+            {% else %}
+            <div class="alert alert-warning">该板块暂无文章</div>
+            {% endfor %}
         </div>
     </div>
 </div>
-
-<style>
-    .list-group-item.active {
-        background-color: #e9f7fe;
-        border-color: #dee2e6;
-        color: #0d6efd;
-        font-weight: 500;
-    }
-    
-    .list-group-item:hover {
-        background-color: #f8f9fa;
-    }
-</style>
 {% endblock %}
