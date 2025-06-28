@@ -7,7 +7,7 @@
 <div class="container">
     <!-- 标题区域 -->
     <div class="d-flex justify-content-between mb-4">
-        <h2 class="mt-3 mb-0">全部板块</h2>
+        <h2 class="mt-3 mb-0">{{ current_category }}</h2>
         
         {% if current_user.is_authenticated and (current_user.can_post or current_user.is_admin) %}
         <div class="d-flex align-items-end">
@@ -18,49 +18,127 @@
         {% endif %}
     </div>
     
-    <!-- 分类选择面板 -->
-    <div class="card mb-4">
-        <div class="card-body">
-            <div class="d-flex flex-wrap gap-2">
-                {% for cat in categories %}
-                <a href="{% if cat.id %}/category/{{ cat.id }}{% else %}/category/{% endif %}" 
-                   class="btn {% if cat.active %}btn-primary{% else %}btn-outline-primary{% endif %} btn-sm">
-                   {{ cat.name }}
-                   <span class="badge bg-secondary ms-1">{{ cat.count }}</span>
-                </a>
-                {% endfor %}
+    <div class="row">
+        <!-- 左侧分类面板 (25%宽度) -->
+        <div class="col-md-3">
+            <div class="card mb-4">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0">板块导航</h5>
+                </div>
+                <div class="card-body p-0">
+                    <ul class="list-group list-group-flush">
+                        {% for cat in categories %}
+                        <a href="{% if cat.id %}/category/{{ cat.id }}{% else %}/category/{% endif %}" 
+                           class="list-group-item list-group-item-action d-flex justify-content-between align-items-center {% if cat.active %}active{% endif %}">
+                           {{ cat.name }}
+                           <span class="badge bg-{% if cat.active %}light text-dark{% else %}secondary{% endif %} rounded-pill">{{ cat.count }}</span>
+                        </a>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+            
+            <!-- 站务公告 -->
+            <div class="card">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0">站务公告</h5>
+                </div>
+                <div class="card-body">
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item p-2">
+                            <a href="#" class="text-decoration-none">论坛使用规则</a>
+                        </li>
+                        <li class="list-group-item p-2">
+                            <a href="#" class="text-decoration-none">社区积分制度</a>
+                        </li>
+                        <li class="list-group-item p-2">
+                            <a href="#" class="text-decoration-none">反馈与建议</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 右侧帖子列表 (75%宽度) -->
+        <div class="col-md-9">
+            <div class="card">
+                <div class="card-body p-0">
+                    <!-- 帖子列表 -->
+                    <div class="list-group list-group-flush">
+                        {% for post in posts %}
+                        <div class="list-group-item">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <!-- 左侧内容 -->
+                                <div class="me-3 flex-grow-1">
+                                    <h5 class="mb-1">
+                                        <a href="{{ url_for('show_post', post_id=post.id) }}" class="text-decoration-none">
+                                            {{ post.title }}
+                                        </a>
+                                    </h5>
+                                    <div class="d-flex align-items-center small text-muted mt-2">
+                                        <span class="badge bg-secondary me-2">{{ post.category }}</span>
+                                        <span class="me-3">
+                                            <i class="bi bi-person"></i> {{ post.author.username }}
+                                        </span>
+                                        <span>
+                                            <i class="bi bi-clock"></i> {{ post.created_at.strftime('%Y-%m-%d %H:%M') }}
+                                        </span>
+                                    </div>
+                                </div>
+                                
+                                <!-- 右侧信息 -->
+                                <div class="d-flex flex-column align-items-end">
+                                    <div class="d-flex gap-2">
+                                        <span class="text-muted">
+                                            <i class="bi bi-chat"></i> 0
+                                        </span>
+                                        <span class="text-muted">
+                                            <i class="bi bi-eye"></i> 0
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% else %}
+                        <div class="list-group-item">
+                            <div class="text-center py-4 text-muted">
+                                <i class="bi bi-inbox" style="font-size: 2rem;"></i>
+                                <p class="mt-2 mb-0">该板块暂无文章</p>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    
+                    <!-- 分页控件 -->
+                    <nav class="p-3">
+                        <ul class="pagination justify-content-center mb-0">
+                            <li class="page-item disabled">
+                                <a class="page-link" href="#" tabindex="-1">上一页</a>
+                            </li>
+                            <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                            <li class="page-item"><a class="page-link" href="#">2</a></li>
+                            <li class="page-item"><a class="page-link" href="#">3</a></li>
+                            <li class="page-item">
+                                <a class="page-link" href="#">下一页</a>
+                            </li>
+                        </ul>
+                    </nav>
+                </div>
             </div>
         </div>
     </div>
-    
-    <!-- 帖子列表 -->
-    {% for post in posts %}
-    <div class="card mb-3">
-        <div class="card-body">
-            <div class="d-flex justify-content-between align-items-center">
-                <!-- 左侧内容 -->
-                <div class="d-flex flex-column justify-content-center me-3">
-                    <h5 class="card-title mb-2">
-                        <a href="{{ url_for('show_post', post_id=post.id) }}">{{ post.title }}</a>
-                    </h5>
-                    <p class="text-muted small mb-0">
-                        <span class="badge bg-secondary">{{ post.category }}</span>
-                        作者：{{ post.author.username }} |
-                        发布于：{{ post.created_at.strftime('%Y-%m-%d') }}
-                    </p>
-                </div>
-                
-                <!-- 右侧按钮组 -->
-                <div class="d-flex gap-2 align-items-center">
-                    <a href="{{ url_for('show_post', post_id=post.id) }}" class="btn btn-primary btn-sm">
-                        阅读全文
-                    </a>
-                </div>
-            </div>
-        </div>
-    </div>
-    {% else %}
-    <div class="alert alert-warning">暂无文章</div>
-    {% endfor %}
 </div>
+
+<style>
+    .list-group-item.active {
+        background-color: #e9f7fe;
+        border-color: #dee2e6;
+        color: #0d6efd;
+        font-weight: 500;
+    }
+    
+    .list-group-item:hover {
+        background-color: #f8f9fa;
+    }
+</style>
 {% endblock %}
