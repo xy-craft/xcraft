@@ -16,10 +16,18 @@ from datetime import datetime, timedelta
 from functools import wraps
 import markdown
 from sqlalchemy import func, text
+import os
+import time
+from datetime import datetime, timedelta
+import pytz
+
+os.environ['TZ'] = 'Asia/Shanghai'
 
 app = Flask(__name__)
 app.config.from_pyfile('config.py')
 db = SQLAlchemy(app)
+
+app.config['TIMEZONE'] = 'Asia/Shanghai'
 
 # 在这里注册模板过滤器
 @app.template_filter('markdown')
@@ -46,7 +54,7 @@ class User(db.Model, UserMixin):
     password = db.Column(db.String(255), nullable=False)
     is_admin = db.Column(db.Boolean, default=False)
     can_post = db.Column(db.Boolean, default=False)
-    reg_date = db.Column(db.DateTime, default=datetime.utcnow)
+    reg_date = db.Column(db.DateTime, default=lambda: datetime.now(pytz.timezone('Asia/Shanghai')))
     posts = db.relationship('Post', backref='author', lazy=True)
 
 class AvailableUID(db.Model):
@@ -58,7 +66,7 @@ class Post(db.Model):
     title = db.Column(db.String(100), nullable=False)
     content = db.Column(db.Text, nullable=False)
     category = db.Column(db.String(20))
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    created_at = db.Column(db.DateTime, default=lambda: datetime.now(pytz.timezone('Asia/Shanghai')))
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     @classmethod
     def get_min_available_id(cls):
@@ -196,7 +204,12 @@ def post_edit_required(f):
 def datetimeformat(value, format='%Y-%m-%d %H:%M'):
     if value is None:
         return ""
-    return value.strftime(format)
+    
+    # 转换为北京时间
+    utc_time = value.replace(tzinfo=pytz.utc)
+    beijing_time = utc_time.astimezone(pytz.timezone('Asia/Shanghai'))
+    
+    return beijing_time.strftime(format)
 
 # 注册过滤器到Jinja环境
 app.jinja_env.filters['datetimeformat'] = datetimeformat
@@ -207,7 +220,7 @@ app.jinja_env.filters['datetimeformat'] = datetimeformat
 @app.route('/')
 def index():
     welcome_content = """
-# Welcome to 『 Xcraft 』
+# Welcome to『 Xcraft 』
 
 欢迎来到 xuyang 的 blog！
 

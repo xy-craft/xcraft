@@ -89,36 +89,89 @@ body {
     }
 }
 
-/* 欢迎板块样式 */
+/* 更新欢迎板块样式 */
 .welcome-section {
-    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-    border-left: 4px solid #0d6efd;
+    margin-top: 50px;
+    background: linear-gradient(135deg, #f7faff 0%, #f3faff 100%);
+    border-left: 4px solid #4da6ff;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    padding: 25px;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s ease; /* 添加过渡动画 */
+}
+/* 添加文字左边距 */
+.welcome-section h1,
+.welcome-section p,
+.welcome-section ul,
+.welcome-section li {
+    padding-left: 20px; /* 添加统一的左边距 */
 }
 
+/* 悬停效果 */
+.welcome-section:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
+    border-left-color: #0d6efd;
+}
+
+/* 标题样式 */
 .welcome-section h1 {
-    color: #2c3e50;
-    font-size: 2.5rem;
-    margin-bottom: 1.5rem;
+    color: #0e6de9;
+    font-size: 2.3rem;
+    margin-bottom: 1.2rem;
+    position: relative;
 }
 
+/* 文字样式 */
 .welcome-section p {
-    font-size: 1.1rem;
-    line-height: 1.8;
+    font-size: 1.15rem;
+    line-height: 1.7;
+    color: #444;
 }
 
+.welcome-section strong {
+    color: #0e6de9;
+    font-weight: 600;
+}
+
+/* 列表样式 */
 .welcome-section ul {
-    padding-left: 2rem;
+    padding-left: 2.8rem;
+    list-style-type: disc; /* 明确指定列表样式 */
+    list-style-position: outside; /* 确保标记点在文本外部 */
 }
 
-.welcome-section a {
-    color: #0d6efd;
-    text-decoration: none;
-    transition: all 0.3s;
+.welcome-section li {
+    margin-bottom: 0.7rem;
+    font-size: 1.1rem;
+    color: #444;
+    padding-left: 0; /* 重置左边距 */
+    text-indent: -15px; /* 重置文本缩进 */
+    display: list-item;
 }
 
-.welcome-section a:hover {
-    color: #0a58ca;
-    text-decoration: underline;
+/* 响应式调整 */
+@media (max-width: 768px) {
+    .welcome-section {
+        padding: 20px 15px;
+    }
+    
+    .welcome-section h1 {
+        font-size: 1.8rem;
+    }
+}
+
+/* 响应式调整 */
+@media (max-width: 768px) {
+    .welcome-section {
+        padding: 20px 15px;
+    }
+    
+    .welcome-section h1 {
+        font-size: 1.8rem;
+    }
 }
 
 /* 所有按钮统一高度 */
