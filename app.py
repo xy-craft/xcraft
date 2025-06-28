@@ -230,10 +230,43 @@ def index():
                          posts=posts,
                          welcome_html=welcome_html)  # 新增参数
 
+# 分类路由
 @app.route('/category/<category>')
 def category(category):
+    # 获取分类名称映射
+    category_names = {
+        'OI': 'OI 学习',
+        'study': '文化课学习',
+        'relax': '休闲娱乐',
+        'announce': '站务板'
+    }
+    
+    # 获取当前分类名称
+    current_category_name = category_names.get(category, category)
+    
+    # 获取该分类下的所有文章
     posts = Post.query.filter_by(category=category).order_by(Post.created_at.desc()).all()
-    return render_template('category.html', posts=posts, category=category)
+    
+    # 定义板块列表
+    categories = [
+        {'id': '', 'name': '全部板块', 'active': False},
+        {'id': 'announce', 'name': '站务板', 'active': category == 'announce'},
+        {'id': 'OI', 'name': 'OI 学习', 'active': category == 'OI'},
+        {'id': 'study', 'name': '文化课学习', 'active': category == 'study'},
+        {'id': 'relax', 'name': '休闲娱乐', 'active': category == 'relax'}
+    ]
+    
+    # 计算每个板块的文章数量
+    for cat in categories:
+        if cat['id'] == '':
+            cat['count'] = Post.query.count()
+        else:
+            cat['count'] = Post.query.filter_by(category=cat['id']).count()
+    
+    return render_template('discuss.html', 
+                         posts=posts, 
+                         categories=categories, 
+                         current_category=current_category_name)
 
 @app.route('/post/<int:post_id>')
 def show_post(post_id):
@@ -258,6 +291,33 @@ def user_detail(uid):
     return render_template('user_detail.html', 
                          user=user,
                          posts=posts)
+
+# 讨论区主页面路由
+@app.route('/category/')
+def discuss():
+    # 获取所有文章（按时间倒序）
+    posts = Post.query.order_by(Post.created_at.desc()).all()
+    
+    # 定义板块列表
+    categories = [
+        {'id': '', 'name': '全部板块', 'active': True},
+        {'id': 'announce', 'name': '站务板', 'active': False},
+        {'id': 'OI', 'name': 'OI 学习', 'active': False},
+        {'id': 'study', 'name': '文化课学习', 'active': False},
+        {'id': 'relax', 'name': '休闲娱乐', 'active': False}
+    ]
+    
+    # 计算每个板块的文章数量
+    for cat in categories:
+        if cat['id'] == '':
+            cat['count'] = len(posts)
+        else:
+            cat['count'] = Post.query.filter_by(category=cat['id']).count()
+    
+    return render_template('discuss.html', 
+                         posts=posts, 
+                         categories=categories, 
+                         current_category='全部板块')
 
 # dashboard
 @app.route('/admin/')
