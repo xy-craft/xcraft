@@ -45,15 +45,16 @@
                     <div class="d-flex justify-content-between">
                         <!-- 左侧内容 -->
                         <div class="d-flex flex-column me-3" style="width: 80%;">
-                            <h5 class="card-title mb-2">
-                                <a href="{{ url_for('show_post', post_id=post.id) }}" class="text-decoration-none">
+                            <h6 class="card-title mb-2"> <!-- 从 h5 改为 h6 -->
+                                <a href="{{ url_for('show_post', post_id=post.id) }}" 
+                                class="text-decoration-none text-dark"> <!-- 从蓝色改为黑色 -->
                                     {{ post.title }}
                                 </a>
-                            </h5>
+                            </h6>
                             
-                            <div class="d-flex align-items-center text-muted small">
+                            <div class="d-flex align-items-center text-muted">
                                 <span class="badge bg-secondary me-2">
-                                    {% if post.category == 'OI' %}OI学习
+                                    {% if post.category == 'OI' %}OI 学习
                                     {% elif post.category == 'study' %}文化课学习
                                     {% elif post.category == 'relax' %}休闲娱乐
                                     {% elif post.category == 'announce' %}站务板
@@ -66,7 +67,7 @@
                         
                         <!-- 右侧信息 -->
                         <div class="d-flex flex-column align-items-end justify-content-center">
-                            <a href="{{ url_for('show_post', post_id=post.id) }}" class="btn btn-outline-primary btn-sm">
+                            <a href="{{ url_for('show_post', post_id=post.id) }}" class="btn btn-primary btn-sm">
                                 查看详情
                             </a>
                         </div>
