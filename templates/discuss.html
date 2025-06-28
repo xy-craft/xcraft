@@ -21,13 +21,13 @@
     <div class="row">
         <!-- 左侧分类面板 -->
         <div class="col-md-2 mb-4">
-            <div class="card">
-                <div class="list-group list-group-flush border-0 rounded">
+            <div class="card border-0 bg-light"> <!-- 添加浅灰色背景 -->
+                <div class="list-group list-group-flush border-0 rounded small"> <!-- 添加 small 类使字体变小 -->
                     {% for cat in categories %}
                     <a href="{% if cat.id %}/category/{{ cat.id }}{% else %}/category/{% endif %}" 
-                       class="list-group-item list-group-item-action border-0 py-2 {% if cat.active %}active{% endif %}">
+                    class="list-group-item list-group-item-action border-0 py-2 {% if cat.active %}text-primary fw-bold{% else %}text-dark{% endif %}"> <!-- 修改选中样式 -->
                         {{ cat.name }}
-                        <span class="badge bg-secondary rounded-pill">{{ cat.count }}</span>
+                        <span class="badge bg-secondary rounded-pill float-end">{{ cat.count }}</span>
                     </a>
                     {% endfor %}
                 </div>
