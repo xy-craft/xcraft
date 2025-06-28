@@ -35,16 +35,16 @@
         </div>
         
         <!-- 右侧帖子列表 -->
-        <div class="col-md-9">
+        <div class="col-md-10">
             {% for post in posts %}
             <div class="card mb-3">
                 <div class="card-body">
                     <div class="d-flex justify-content-between">
                         <!-- 左侧内容 -->
                         <div class="d-flex flex-column me-3" style="width: 80%;">
-                            <h6 class="card-title mb-2"> <!-- 从 h5 改为 h6 -->
+                            <h6 class="card-title mb-2">
                                 <a href="{{ url_for('show_post', post_id=post.id) }}" 
-                                class="text-decoration-none text-dark"> <!-- 从蓝色改为黑色 -->
+                                class="text-decoration-none text-dark">
                                     {{ post.title }}
                                 </a>
                             </h6>
