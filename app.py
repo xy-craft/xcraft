@@ -279,7 +279,8 @@ def category(category):
     return render_template('discuss.html', 
                          posts=posts, 
                          categories=categories, 
-                         current_category=current_category_name)
+                         current_category=current_category_name,
+                         current_category_id=category)  # 添加当前分类ID
 
 @app.route('/post/<int:post_id>')
 def show_post(post_id):
@@ -330,7 +331,8 @@ def discuss():
     return render_template('discuss.html', 
                          posts=posts, 
                          categories=categories, 
-                         current_category='全部板块')
+                         current_category='全部板块',
+                         current_category_id='')  # 添加空字符串作为ID
 
 # dashboard
 @app.route('/admin/')
