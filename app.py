@@ -26,7 +26,7 @@ os.environ['TZ'] = 'Asia/Shanghai'
 app = Flask(__name__)
 app.config.from_pyfile('config.py')
 db = SQLAlchemy(app)
-
+app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 24 * 60 * 60  # 24小时
 app.config['TIMEZONE'] = 'Asia/Shanghai'
 
 # 在这里注册模板过滤器
@@ -756,4 +756,4 @@ def upload_file():
 if __name__ == '__main__':
     with app.app_context():
         db.create_all()
-    app.run(debug=True)
+    app.run(debug=False)

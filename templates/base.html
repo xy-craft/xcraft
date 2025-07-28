@@ -1,36 +1,44 @@
 <!-- templates/base.html -->
 <!DOCTYPE html>
 <html lang="zh-CN">
+
 <head>
+
     <!-- 基础元数据 -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %} Xcraft {% endblock %}</title>
-    
+
+    <!-- 图标 -->
+    <!-- 默认图标（兼容所有浏览器） -->
+    <link rel="icon" href="{{ url_for('static', filename='favicon-default.ico') }}">
+
+    <!-- 主题敏感图标（现代浏览器） -->
+    <link rel="icon" href="{{ url_for('static', filename='favicon-light.ico') }}" media="(prefers-color-scheme: dark)">
+    <link rel="icon" href="{{ url_for('static', filename='favicon-dark.ico') }}" media="(prefers-color-scheme: light)">
+
     <!-- 字体和图标 -->
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <!-- <link rel="stylesheet" href="{{ url_for('static', filename='css/all.min.css') }}"> -->
     <link href="https://fonts.googleapis.com/css2?family=Fira+Code&display=swap" rel="stylesheet">
     <link href="https://cdn.bootcdn.net/ajax/libs/bootstrap-icons/1.11.0/font/bootstrap-icons.min.css" rel="stylesheet">
-    
+
     <!-- 核心CSS -->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/custom.css') }}">
-    
+
     <!-- Markdown -->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/markdown-palettes.css') }}">
-    
+
     <!-- 动态CSS块 -->
     {% block styles %}{% endblock %}
-    
-    <!-- 图标 -->
-    <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}">
-    
+
     <!-- 内联样式 -->
     <style>
         html {
             overflow-y: scroll;
             scrollbar-gutter: stable;
         }
+
         body {
             background-color: #efefef;
             padding-bottom: 2rem;
@@ -66,14 +74,14 @@
 
     <main class="container mt-4">
         {% with messages = get_flashed_messages(with_categories=true) %}
-            {% if messages %}
-                {% for category, message in messages %}
-                <div class="alert alert-{{ category }} alert-dismissible fade show">
-                    {{ message }}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                </div>
-                {% endfor %}
-            {% endif %}
+        {% if messages %}
+        {% for category, message in messages %}
+        <div class="alert alert-{{ category }} alert-dismissible fade show">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+        {% endfor %}
+        {% endif %}
         {% endwith %}
 
         {% block content %}{% endblock %}
@@ -87,19 +95,20 @@
 
     <!-- 通用脚本初始化 -->
     <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // 动态内容加载后重新渲染MathJax
-        if (typeof MathJax !== 'undefined' && MathJax.typesetPromise) {
-            new MutationObserver(() => {
-                MathJax.typesetPromise();
-            }).observe(document.body, {
-                childList: true,
-                subtree: true
-            });
-        }
-    });
+        document.addEventListener('DOMContentLoaded', function () {
+            // 动态内容加载后重新渲染MathJax
+            if (typeof MathJax !== 'undefined' && MathJax.typesetPromise) {
+                new MutationObserver(() => {
+                    MathJax.typesetPromise();
+                }).observe(document.body, {
+                    childList: true,
+                    subtree: true
+                });
+            }
+        });
     </script>
 
     {% block scripts %}{% endblock %}
 </body>
+
 </html>
