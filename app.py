@@ -97,7 +97,7 @@ class EmptyPost:
         self.title = ""
         self.content = ""
         self.category = "OI" # 设置默认分类
-        self.created_at = datetime.utcnow()  # 可选添加
+        self.created_at = datetime.now(pytz.timezone('Asia/Shanghai'))  # 修改这里
 
 # 3. 实现UID查找逻辑
 def find_available_uid():
@@ -356,7 +356,7 @@ def admin_dashboard():
     latest_user = User.query.order_by(User.reg_date.desc()).first()
     
     # 月度文章趋势（最近6个月）
-    six_months_ago = datetime.utcnow() - timedelta(days=180)
+    six_months_ago = datetime.now(pytz.timezone('Asia/Shanghai')) - timedelta(days=180)
     
     monthly_posts = db.session.query(
         db.func.date_format(Post.created_at, '%Y-%m').label('month'),

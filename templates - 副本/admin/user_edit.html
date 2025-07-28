@@ -1,0 +1,110 @@
+<!-- templates/admin/user_edit.html -->
+{% extends "admin/base.html" %}
+
+{% block admin_content %}
+<div class="container">
+    <!-- 编辑表单头部 -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>编辑用户：{{ user.username }}</h2>
+        <a href="{{ url_for('admin_user_list') }}" class="btn btn-outline-secondary btn-sm">
+            <i class="bi bi-arrow-left"></i> 返回列表
+        </a>
+    </div>
+
+    <!-- 编辑表单 -->
+    <form method="POST">
+        <div class="card">
+            <div class="card-body">
+                <!-- 用户ID字段 -->
+                <div class="mb-3">
+                    <label class="form-label">用户 ID (UID)</label>
+                    <input type="number" class="form-control" name="uid"
+                    min="1"
+                    placeholder="留空将保持当前UID：{{ user.id }}"> <!-- 添加提示 -->
+                    <div class="form-text text-muted small">
+                        当前UID: {{ user.id }}，修改需确保唯一性 <!-- 显示当前值 -->
+                    </div>
+                </div>
+
+                <!-- 用户名字段 -->
+                <div class="mb-3">
+                    <label class="form-label">用户名</label>
+                    <input type="text" class="form-control" name="username" value="{{ user.username }}" required>
+                </div>
+
+                <!-- 密码修改部分保持不变... -->
+                <div class="mb-3">
+                    <label class="form-label">修改密码（留空不修改）</label>
+                    <div class="row g-2">
+                        <div class="col-md-6">
+                            <input type="password" class="form-control" name="new_password" placeholder="新密码"
+                                pattern=".{6,}" title="密码至少6个字符">
+                        </div>
+                        <div class="col-md-6">
+                            <input type="password" class="form-control" name="confirm_password" placeholder="确认新密码">
+                        </div>
+                    </div>
+                    <div class="form-text text-muted small">
+                        密码至少6个字符，留空将保持原密码不变
+                    </div>
+                </div>
+
+
+                <div class="mb-3 form-check">
+                    <input type="checkbox" class="form-check-input" id="can_post" name="can_post" {{ 'checked' if
+                        user.can_post }}>
+                    <label class="form-check-label" for="can_post">发表帖子权限</label>
+                </div>
+
+                <!-- 管理员权限开关 -->
+                <div class="mb-3 form-check">
+                    <input type="checkbox" class="form-check-input" id="is_admin" name="is_admin" {{ 'checked' if
+                        user.is_admin }}>
+                    <label class="form-check-label" for="is_admin">管理员权限</label>
+                </div>
+
+                <!-- 提交按钮 -->
+                <button type="submit" class="btn btn-primary">
+                    <i class="bi bi-save"></i> 保存修改
+                </button>
+            </div>
+        </div>
+    </form>
+</div>
+{% endblock %}
+
+<script>
+    // 管理员选中时自动勾选并禁用权限
+    document.getElementById('is_admin').addEventListener('change', function () {
+        const checkboxes = document.querySelectorAll('input[name="permissions"]');
+        checkboxes.forEach(checkbox => {
+            checkbox.disabled = this.checked;
+            checkbox.checked = this.checked;
+        });
+    });
+</script>
+
+<script>
+    document.querySelector('form').addEventListener('submit', function (e) {
+        const uidInput = document.querySelector('input[name="uid"]');
+
+        // 清空无效输入的警告
+        uidInput.setCustomValidity('');
+
+        // 处理留空逻辑
+        if (uidInput.value.trim() === '') {
+            // 移除必填验证提示
+            uidInput.removeAttribute('required');
+            // 设置空值标识
+            uidInput.value = '';
+        } else {
+            // 数值有效性验证
+            const uidValue = parseInt(uidInput.value);
+            if (uidValue < 1 || isNaN(uidValue)) {
+                uidInput.setCustomValidity('UID必须为正整数');
+                e.preventDefault();
+                uidInput.reportValidity();
+            }
+        }
+    });
+</script>

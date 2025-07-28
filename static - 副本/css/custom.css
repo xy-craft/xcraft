@@ -1,0 +1,252 @@
+/* static/css/custom.css */
+/* 基础样式 */
+body {
+    background-color: #f8f9fa;
+}
+
+/* Markdown内容样式 */
+.markdown-content {
+    line-height: 1.8;
+    font-size: 16px;
+    color: #333;
+}
+
+.markdown-content h1, 
+.markdown-content h2, 
+.markdown-content h3 {
+    margin-top: 1.5em;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 0.3em;
+}
+
+.markdown-content code {
+    background-color: #f3f3f3;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: Monaco, Consolas, "Courier New", monospace;
+}
+
+.markdown-content pre {
+    background-color: #f8f9fa;
+    padding: 15px;
+    border-radius: 5px;
+    overflow-x: auto;
+}
+
+.markdown-content pre code {
+    background-color: transparent;
+    padding: 0;
+    font-size: 14px;
+}
+
+.markdown-content blockquote {
+    border-left: 4px solid #ddd;
+    margin: 1em 0;
+    padding: 0 1em;
+    color: #666;
+}
+
+.markdown-content table {
+    border-collapse: collapse;
+    margin: 1em 0;
+    width: 100%;
+}
+
+.markdown-content th,
+.markdown-content td {
+    border: 1px solid #ddd;
+    padding: 8px;
+}
+
+.markdown-content th {
+    background-color: #f8f9fa;
+}
+
+/* MathJax字体覆盖 */
+.MathJax {
+    font-family: Times New Roman, serif !important;
+}
+
+/* 自定义按钮样式 */
+.btn-post {
+    width: 120px;
+    margin: 10px;
+}
+
+/* 调整导航项间距 */
+.navbar-nav .nav-item {
+    margin-right: 1.5rem;
+}
+
+/* 移动端优化 */
+@media (max-width: 992px) {
+    .navbar-collapse {
+        padding-top: 1rem;
+    }
+    .navbar-nav .nav-item {
+        margin-right: 0;
+        margin-bottom: 0.5rem;
+    }
+}
+
+/* 更新欢迎板块样式 */
+.welcome-section {
+    margin-top: 50px;
+    background: linear-gradient(135deg, #f7faff 0%, #f3faff 100%);
+    border-left: 4px solid #4da6ff;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    padding: 25px;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s ease; /* 添加过渡动画 */
+}
+/* 添加文字左边距 */
+.welcome-section h1,
+.welcome-section p,
+.welcome-section ul,
+.welcome-section li {
+    padding-left: 20px; /* 添加统一的左边距 */
+}
+
+/* 悬停效果 */
+.welcome-section:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
+    border-left-color: #0d6efd;
+}
+
+/* 标题样式 */
+.welcome-section h1 {
+    color: #0e6de9;
+    font-size: 2.3rem;
+    margin-bottom: 1.2rem;
+    position: relative;
+}
+
+/* 文字样式 */
+.welcome-section p {
+    font-size: 1.15rem;
+    line-height: 1.7;
+    color: #444;
+}
+
+.welcome-section strong {
+    color: #0e6de9;
+    font-weight: 600;
+}
+
+/* 列表样式 */
+.welcome-section ul {
+    padding-left: 2.8rem;
+    list-style-type: disc; /* 明确指定列表样式 */
+    list-style-position: outside; /* 确保标记点在文本外部 */
+}
+
+.welcome-section li {
+    margin-bottom: 0.7rem;
+    font-size: 1.1rem;
+    color: #444;
+    padding-left: 0; /* 重置左边距 */
+    text-indent: -15px; /* 重置文本缩进 */
+    display: list-item;
+}
+
+/* 响应式调整 */
+@media (max-width: 768px) {
+    .welcome-section {
+        padding: 20px 15px;
+    }
+    
+    .welcome-section h1 {
+        font-size: 1.8rem;
+    }
+}
+
+/* 响应式调整 */
+@media (max-width: 768px) {
+    .welcome-section {
+        padding: 20px 15px;
+    }
+    
+    .welcome-section h1 {
+        font-size: 1.8rem;
+    }
+}
+
+/* 所有按钮统一高度 */
+.btn {
+    padding: 6px 12px;
+    font-size: 13px;
+}
+
+/* 确保编辑器容器可见 */
+#editor-container {
+    min-height: 600px;
+    background: #fff;
+    border-radius: 4px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+/* 修复预览区域样式 */
+#preview-container {
+    padding: 1rem;
+    overflow-y: auto;
+}
+
+/* 强制显示光标 */
+.mdp-editor {
+    caret-color: #333 !important;
+}
+
+/* 调整文章正文的字体大小和行高 */
+.markdown-content {
+    font-size: 1.4rem;  /* 基础字体大小 */
+    line-height: 1.8;   /* 行高 */
+}
+
+/* 调整标题层级 */
+.markdown-content h1 {
+    font-size: 2.2rem;
+    margin: 2rem 0 1.5rem;
+}
+
+.markdown-content h2 {
+    font-size: 1.8rem;
+    margin: 1.8rem 0 1.2rem;
+}
+
+.markdown-content h3 {
+    font-size: 1.5rem;
+    margin: 1.5rem 0 1rem;
+}
+
+/* 调整段落文字 */
+.markdown-content p {
+    margin-bottom: 1.4rem;
+    font-size: 1.3rem;
+}
+
+/* 调整代码块样式 */
+.markdown-content pre {
+    font-size: 0.95rem;
+    padding: 1.2rem;
+    border-radius: 8px;
+}
+
+/* 调整列表文字 */
+.markdown-content ul,
+.markdown-content ol {
+    font-size: 1.1rem;
+    margin-bottom: 1.2rem;
+}
+
+/* 数学公式容器调整 */
+.MathJax_Display {
+    margin: 1.5rem 0 !important;
+}
+
+/* 定义多套颜色方案 */
+.badge-red { background-color: #dc3545; }
+.badge-blue { background-color: #0d6efd; }
+.badge-purple { background-color: #8e44ad; }
