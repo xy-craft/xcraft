@@ -1,6 +1,19 @@
 <!-- templates/admin/post_edit.html -->
 {% extends "admin/base.html" %}
 
+{% block styles %}
+{{ super() }}
+<style>
+    /* 确保编辑器容器有明确的高度 */
+    .editor-container {
+        height: 700px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        overflow: hidden;
+    }
+</style>
+{% endblock %}
+
 {% block admin_content %} {# 注意这里要匹配管理后台的块 #}
 <div class="container">
     <!-- 动态标题（新建/编辑） -->
@@ -17,25 +30,20 @@
         <div class="mb-3">
             <label class="form-label">分类</label>
             <select name="category" class="form-select" required>
-                <option value="OI" {% if post and post.category=='OI' %}selected{% endif %}>
-                    OI 学习
-                </option>
-                <option value="study" {% if post and post.category=='study' %}selected{% endif %}>
-                    文化课学习
-                </option>
-                <option value="relax" {% if post and post.category=='relax' %}selected{% endif %}>
-                    休闲娱乐
-                </option>
-                <option value="announce" {% if post and post.category=='announce' %}selected{% endif %}>
-                    站务板
-                </option>
+                <option value="OI" {% if post and post.category=='OI' %}selected{% endif %}>OI 学习</option>
+                <option value="study" {% if post and post.category=='study' %}selected{% endif %}>文化课学习</option>
+                <option value="relax" {% if post and post.category=='relax' %}selected{% endif %}>休闲娱乐</option>
+                <option value="announce" {% if post and post.category=='announce' %}selected{% endif %}>站务板</option>
             </select>
         </div>
 
         <!-- 内容编辑区 -->
         <div class="mb-3">
             <label class="form-label">内容（Markdown格式）</label>
-            <textarea name="content" class="form-control" rows="15" required>{{ post.content if post }}</textarea>
+            <div class="editor-container">
+                <div id="editor"></div>
+            </div>
+            <textarea name="content" id="markdown-content" style="display: none">{{ post.content if post else '' }}</textarea>
         </div>
 
         <!-- 提交按钮 -->
@@ -51,4 +59,26 @@
         </div>
     </form>
 </div>
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // 初始化编辑器
+    var editor = new MarkdownPalettes("#editor");
+    
+    // 设置初始内容
+    var contentEl = document.getElementById('markdown-content');
+    if (contentEl) {
+        editor.content = contentEl.value;
+    }
+
+    // 表单提交时同步内容
+    document.querySelector('form').addEventListener('submit', function(e) {
+        document.getElementById('markdown-content').value = editor.content;
+        return true;
+    });
+});
+</script>
 {% endblock %}
