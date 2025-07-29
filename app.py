@@ -20,6 +20,7 @@ import os
 import time
 from datetime import datetime, timedelta
 import pytz
+from markupsafe import escape
 
 os.environ['TZ'] = 'Asia/Shanghai'
 
@@ -30,16 +31,33 @@ app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 24 * 60 * 60  # 24小时
 app.config['TIMEZONE'] = 'Asia/Shanghai'
 
 # 在这里注册模板过滤器
+# 简化 Markdown 配置，移除 codehilite
 @app.template_filter('markdown')
 def convert_markdown(text):
-    # 使用扩展增强功能（如表格、代码块等）
     return markdown.markdown(
         text, 
-        extensions=['extra', 'codehilite'],
+        extensions=[
+            'extra', 
+            'fenced_code',
+            'tables',
+            'nl2br',
+            'pymdownx.tilde',
+            'pymdownx.superfences',
+            'pymdownx.arithmatex'  # 添加数学公式支持
+        ],
         extension_configs={
-            'codehilite': {
-                'use_pygments': True,
-                'css_class': 'codehilite'
+            'pymdownx.superfences': {
+                'custom_fences': [
+                    {
+                        'name': 'mermaid',
+                        'class': 'mermaid',
+                        'format': lambda code: f'<div class="mermaid">{code}</div>'
+                    }
+                ]
+            },
+            'pymdownx.arithmatex': {
+                'generic': True,  # 使用通用数学渲染模式
+                'preview': False   # 禁用预览模式
             }
         }
     )
@@ -285,8 +303,12 @@ def category(category):
 @app.route('/post/<int:post_id>')
 def show_post(post_id):
     post = Post.query.get_or_404(post_id)
-    html_content = markdown.markdown(post.content, extras=["fenced-code-blocks", "tables", "latex"])
-    return render_template('post.html', post=post, content=html_content)
+    # 双重处理：先escape再markdown
+    safe_content = markdown.markdown(
+        escape(post.content),
+        extensions=['fenced_code', 'tables']
+    )
+    return render_template('post.html', post=post, content=safe_content)
 
 # 用户列表路由
 @app.route('/user')
@@ -300,8 +322,8 @@ def user_list():
 @login_required
 def user_detail(uid):
     user = User.query.get_or_404(uid)
-    # 获取用户最近发布的5篇文章
-    posts = Post.query.filter_by(user_id=uid).order_by(Post.created_at.desc()).limit(5).all()
+    # 获取用户最近发布的100篇文章
+    posts = Post.query.filter_by(user_id=uid).order_by(Post.created_at.desc()).limit(100).all()
     return render_template('user_detail.html', 
                          user=user,
                          posts=posts)
@@ -399,10 +421,7 @@ def admin_category(category):
 @admin_required
 def admin_show_post(post_id):
     post = Post.query.get_or_404(post_id)
-    html_content = markdown.markdown(post.content, extras=["fenced-code-blocks", "tables", "latex"])
-    return render_template('admin/post.html', 
-                         post=post, 
-                         content=html_content)
+    return render_template('admin/post.html', post=post, content=escape(post.content))
 
 # 后台文章删除路由
 @app.route('/admin/post/delete/<int:post_id>')
@@ -756,4 +775,4 @@ def upload_file():
 if __name__ == '__main__':
     with app.app_context():
         db.create_all()
-    app.run(debug=False)
+    app.run(debug=True)

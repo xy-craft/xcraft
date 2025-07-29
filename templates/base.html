@@ -22,12 +22,20 @@
     <link href="https://fonts.googleapis.com/css2?family=Fira+Code&display=swap" rel="stylesheet">
     <link href="https://cdn.bootcdn.net/ajax/libs/bootstrap-icons/1.11.0/font/bootstrap-icons.min.css" rel="stylesheet">
 
+    <!-- Markdown -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/markdown-palettes.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/pygments.css') }}">
+
+    <!-- KaTeX -->
+    <link rel="stylesheet" href="https://cdn.bootcdn.net/ajax/libs/KaTeX/0.16.9/katex.min.css">
+
+    <!-- Highlight -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <script>hljs.highlightAll();</script>
+
     <!-- 核心CSS -->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/custom.css') }}">
-
-    <!-- Markdown -->
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/markdown-palettes.css') }}">
 
     <!-- 动态CSS块 -->
     {% block styles %}{% endblock %}
@@ -44,29 +52,6 @@
             padding-bottom: 2rem;
         }
     </style>
-
-    <!-- MathJax 预配置 -->
-    <script>
-        window.MathJax = {
-            tex: {
-                inlineMath: [['$', '$'], ['\\(', '\\)']],
-                displayMath: [['$$', '$$'], ['\\[', '\\]']]
-            },
-            options: {
-                skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre'],
-                ignoreHtmlClass: 'tex2jax_ignore',
-                processHtmlClass: 'tex2jax_process'
-            },
-            startup: {
-                ready: () => {
-                    MathJax.startup.defaultReady();
-                    MathJax.startup.promise.then(() => {
-                        console.log('MathJax initialized');
-                    });
-                }
-            }
-        };
-    </script>
 </head>
 
 <body>
@@ -87,27 +72,50 @@
         {% block content %}{% endblock %}
     </main>
 
-    <!-- 核心JS (放在body底部) -->
+    <!-- 核心JS -->
+    <script>
+        window.VUE_PROD = true;
+    </script>
     <script src="{{ url_for('static', filename='js/vue.min.js') }}"></script>
     <script src="{{ url_for('static', filename='js/bootstrap.bundle.min.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/tex-mml-chtml.js') }}" id="MathJax-script" async></script>
     <script src="{{ url_for('static', filename='js/markdown-palettes.min.js') }}"></script>
 
-    <!-- 通用脚本初始化 -->
+    <!-- KaTeX JS -->
+    <script defer src="https://cdn.bootcdn.net/ajax/libs/KaTeX/0.16.9/katex.min.js"></script>
+    <script defer src="https://cdn.bootcdn.net/ajax/libs/KaTeX/0.16.9/contrib/auto-render.min.js"></script>
+
+    <!-- Highlight.js 代码高亮 -->
+    <!-- 将原来的 monokai 主题改为浅色主题 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/python.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/javascript.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/cpp.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/shell.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/plaintext.min.js"></script>
+    <script
+        src="https://cdnjs.cloudflare.com/ajax/libs/highlightjs-line-numbers.js/2.8.0/highlightjs-line-numbers.min.js"></script>
+
     <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            // 动态内容加载后重新渲染MathJax
-            if (typeof MathJax !== 'undefined' && MathJax.typesetPromise) {
-                new MutationObserver(() => {
-                    MathJax.typesetPromise();
-                }).observe(document.body, {
-                    childList: true,
-                    subtree: true
-                });
-            }
+        document.addEventListener('DOMContentLoaded', (event) => {
+            // 高亮所有代码块
+            document.querySelectorAll('pre code').forEach((el) => {
+                hljs.highlightElement(el);
+                hljs.lineNumbersBlock(el);
+            });
+
+            // 新增KaTeX渲染配置 - 添加对多行公式的支持
+            renderMathInElement(document.body, {
+                delimiters: [
+                    { left: "$$", right: "$$", display: true },
+                    { left: "\\[", right: "\\]", display: true },
+                    { left: "$", right: "$", display: false },
+                    { left: "\\(", right: "\\)", display: false }
+                ],
+                throwOnError: false
+            });
         });
     </script>
-
     {% block scripts %}{% endblock %}
 </body>
 

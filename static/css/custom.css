@@ -11,14 +11,6 @@ body {
     color: #333;
 }
 
-.markdown-content h1, 
-.markdown-content h2, 
-.markdown-content h3 {
-    margin-top: 1.5em;
-    border-bottom: 1px solid #eee;
-    padding-bottom: 0.3em;
-}
-
 .markdown-content code {
     background-color: #f3f3f3;
     padding: 2px 6px;
@@ -39,11 +31,11 @@ body {
     font-size: 14px;
 }
 
-.markdown-content blockquote {
+blockquote {
     border-left: 4px solid #ddd;
     margin: 1em 0;
     padding: 0 1em;
-    color: #666;
+    color: #555;
 }
 
 .markdown-content table {
@@ -60,11 +52,6 @@ body {
 
 .markdown-content th {
     background-color: #f8f9fa;
-}
-
-/* MathJax字体覆盖 */
-.MathJax {
-    font-family: Times New Roman, serif !important;
 }
 
 /* 自定义按钮样式 */
@@ -194,31 +181,33 @@ body {
     overflow-y: auto;
 }
 
-/* 强制显示光标 */
-.mdp-editor {
-    caret-color: #333 !important;
-}
-
 /* 调整文章正文的字体大小和行高 */
 .markdown-content {
     font-size: 1.4rem;  /* 基础字体大小 */
     line-height: 1.8;   /* 行高 */
 }
 
+/* 调整 Markdown 标题间距 */
+.post-content h1,
+.post-content h2,
+.post-content h3,
+.post-content h4,
+.post-content h5,
+.post-content h6 {
+    margin-bottom: 1.0rem; /* 增加标题下方间距 */
+}
+
 /* 调整标题层级 */
 .markdown-content h1 {
     font-size: 2.2rem;
-    margin: 2rem 0 1.5rem;
 }
 
 .markdown-content h2 {
     font-size: 1.8rem;
-    margin: 1.8rem 0 1.2rem;
 }
 
 .markdown-content h3 {
     font-size: 1.5rem;
-    margin: 1.5rem 0 1rem;
 }
 
 /* 调整段落文字 */
@@ -241,12 +230,184 @@ body {
     margin-bottom: 1.2rem;
 }
 
-/* 数学公式容器调整 */
-.MathJax_Display {
-    margin: 1.5rem 0 !important;
+/* 移除Markdown渲染中所有超链接的下划线 */
+.markdown-content a {
+    text-decoration: none;
+}
+
+article a, 
+.markdown-content a,
+.arithmatex a,  /* 数学公式容器内的链接 */
+.markdown-content p a,  /* 段落内的链接 */
+.meta-value a {  /* 右侧信息栏的链接 */
+    text-decoration: none;
+    color: #3498db
 }
 
 /* 定义多套颜色方案 */
-.badge-red { background-color: #dc3545; }
-.badge-blue { background-color: #0d6efd; }
-.badge-purple { background-color: #8e44ad; }
+.author-name {
+    font-weight: bold;
+    font-size: 1.2rem;
+}
+.badge-red, .badge-purple {
+    padding: 0.45em 0.8em;
+    font-size: 50%;
+    font-weight: 700;
+    line-height: 1;
+    text-align: center;
+    white-space: nowrap;
+    vertical-align: baseline;
+    border-radius: 0.4rem;
+    display: inline-block;
+    vertical-align: middle;
+}
+
+.badge-red {
+    background-color: #fe4c61;
+    color: white;
+}
+
+.badge-purple {
+    background-color: #9c3dcf;
+    color: white;
+}
+
+/* 调整徽章位置 */
+.author-name .badge {
+    position: relative;
+    top: -0.1em;
+    margin-left: 0.3em;
+}
+
+/* 添加表格基本样式 */
+table {
+    width: 100%;
+    margin-bottom: 1rem;
+    border-collapse: collapse;
+}
+th, td {
+    padding: 0.5rem;
+    border: 1px solid #dee2e6;
+}
+
+/* 代码块整体样式 */
+pre code.hljs {
+    background-color: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-radius: 10px;
+    padding: 1rem;
+    font-family: 'Fira Code', monospace;
+    font-size: 0.9em;
+    overflow-x: auto;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+/* 移除行间分隔线 */
+.hljs-line {
+    border-bottom: none;
+}
+
+/* 移除行号与代码之间的竖线 */
+.hljs-line-numbers {
+    border-left: none;
+}
+
+.hljs-line-numbers > .hljs-line::before {
+    border-right: none;
+    background-color: transparent;
+    margin-right: 10px;
+    padding-right: 5px;
+}
+
+/* 调整行号样式 */
+.hljs-line-numbers > .hljs-line::before {
+    counter-increment: line;
+    content: counter(line);
+    display: inline-block;
+    width: 30px;
+    color: #6c757d;
+    text-align: right;
+}
+
+/* 移除代码块表格的所有边框和分隔线 */
+.highlight table.hljs-ln {
+    border-collapse: collapse;
+    border-spacing: 0;
+    border: none;
+    width: auto;
+}
+
+/* 移除行号单元格的右边框 */
+.highlight .hljs-ln-line.hljs-ln-numbers {
+    border-right: none;
+    padding-right: 10px;
+    text-align: right;
+    color: #999;
+    background-color: transparent;
+}
+
+.hljs-ln-line {
+    line-height: 1.5;  /* 默认通常是1.2-1.5，调整为1.5-2.0 */
+}
+
+/* 移除代码单元格的左边框 */
+.highlight .hljs-ln-line.hljs-ln-code {
+    border-left: none;
+    padding-left: 10px;
+}
+
+/* 移除表格行之间的边框 */
+.highlight tr {
+    border: none;
+}
+
+/* 移除表格单元格之间的边框 */
+.highlight td {
+    border: none;
+    padding: 2px 8px;
+}
+
+/* 可选：调整行号颜色 */
+.highlight .hljs-ln-n:before {
+    color: #999;
+}
+
+.highlight table.hljs-ln {
+    margin-bottom: 0;  /* 移除表格的下边距 */
+}
+
+/* 数学公式容器样式 */
+.katex-display {
+    overflow-x: auto;
+    overflow-y: hidden;
+    padding: 1rem 0;
+    margin: 1.5rem 0;
+}
+
+/* 行内公式样式 */
+.katex {
+    font-size: 1.1em;
+}
+
+/* 复杂公式换行支持 */
+.katex-display > .katex {
+    white-space: normal;
+}
+
+/* 公式滚动容器 */
+.math-container {
+    max-width: 100%;
+    overflow-x: auto;
+}
+/* 精准控制 KaTeX 的换行间距（核心解决方案） */
+.katex .newline {
+    margin-bottom: 0.5em !important;  /* 调整这个值控制行距 */
+    display: block;
+    height: 0;
+}
+
+/* 精准控制行间公式间距 */
+.arithmatex .katex-display {
+    margin: 0.5em 0;  /* 上下边距从默认1em改为0.2em */
+    padding: 0.3em;       /* 移除内边距 */
+}
