@@ -15,9 +15,9 @@
             <div class="author-info">
                 <span class="author-name">
                     <strong>
-                        <a href="{{ url_for('user_detail', uid=post.author.id) }}" 
-                        style="color: {% if post.author.is_admin %}#9c3dcf{% elif post.author.can_post %}#fe4c61{% else %}#333{% endif %}">
-                        {{ post.author.username }}
+                        <a href="{{ url_for('user_detail', uid=post.author.id) }}"
+                            class="{% if post.author.is_admin %}text-purple{% elif post.author.can_post %}text-red{% else %}text-blue{% endif %}">
+                            {{ post.author.username }}
                         </a>
                     </strong>
                     {% if post.author.can_post %}
@@ -42,9 +42,9 @@
                 <span class="meta-label">创建者</span>
                 <span class="author-name">
                     <strong>
-                        <a href="{{ url_for('user_detail', uid=post.author.id) }}" 
-                        style="color: {% if post.author.is_admin %}#9c3dcf{% elif post.author.can_post %}#fe4c61{% else %}#333{% endif %}">
-                        {{ post.author.username }}
+                        <a href="{{ url_for('user_detail', uid=post.author.id) }}"
+                            class="{% if post.author.is_admin %}text-purple{% elif post.author.can_post %}text-red{% else %}text-blue{% endif %}">
+                            {{ post.author.username }}
                         </a>
                     </strong>
                     {% if post.author.can_post %}
