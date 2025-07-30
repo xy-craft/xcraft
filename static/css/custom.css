@@ -254,6 +254,20 @@ span a,
     color: #3498db
 }
 
+/* 悬停深蓝色 */
+article a:hover,
+span a:hover,
+.markdown-content a:hover,
+.arithmatex a:hover,
+/* 数学公式容器内的链接 */
+.markdown-content p a:hover,
+/* 段落内的链接 */
+.meta-value a:hover {
+    /* 右侧信息栏的链接 */
+    text-decoration: none;
+    color: #0a58ca
+}
+
 /* 定义多套颜色方案 */
 .author-name {
     font-weight: bold;
