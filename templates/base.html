@@ -23,7 +23,7 @@
     <link href="https://cdn.bootcdn.net/ajax/libs/bootstrap-icons/1.11.0/font/bootstrap-icons.min.css" rel="stylesheet">
 
     <!-- Markdown -->
-    <link href="https://markdown-palettes.xycraft.dpdns.org/markdown-palettes.min.js" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/markdown-palettes.css') }}">
 
     <!-- KaTeX -->
     <link rel="stylesheet" href="https://cdn.bootcdn.net/ajax/libs/KaTeX/0.16.9/katex.min.css">
@@ -77,7 +77,9 @@
     </script>
     <script src="{{ url_for('static', filename='js/vue.min.js') }}"></script>
     <script src="{{ url_for('static', filename='js/bootstrap.bundle.min.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/markdown-palettes.min.js') }}"></script>
+
+    <!-- Markdown -->
+    <link href="https://markdown-palettes.xycraft.dpdns.org/markdown-palettes.min.js" rel="stylesheet">
 
     <!-- KaTeX JS -->
     <script defer src="https://cdn.bootcdn.net/ajax/libs/KaTeX/0.16.9/katex.min.js"></script>
