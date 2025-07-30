@@ -70,6 +70,7 @@ blockquote {
     .navbar-collapse {
         padding-top: 1rem;
     }
+
     .navbar-nav .nav-item {
         margin-right: 0;
         margin-bottom: 0.5rem;
@@ -86,14 +87,17 @@ blockquote {
     padding: 25px;
     position: relative;
     overflow: hidden;
-    transition: all 0.3s ease; /* 添加过渡动画 */
+    transition: all 0.3s ease;
+    /* 添加过渡动画 */
 }
+
 /* 添加文字左边距 */
 .welcome-section h1,
 .welcome-section p,
 .welcome-section ul,
 .welcome-section li {
-    padding-left: 20px; /* 添加统一的左边距 */
+    padding-left: 20px;
+    /* 添加统一的左边距 */
 }
 
 /* 悬停效果 */
@@ -126,16 +130,20 @@ blockquote {
 /* 列表样式 */
 .welcome-section ul {
     padding-left: 2.8rem;
-    list-style-type: disc; /* 明确指定列表样式 */
-    list-style-position: outside; /* 确保标记点在文本外部 */
+    list-style-type: disc;
+    /* 明确指定列表样式 */
+    list-style-position: outside;
+    /* 确保标记点在文本外部 */
 }
 
 .welcome-section li {
     margin-bottom: 0.7rem;
     font-size: 1.1rem;
     color: #444;
-    padding-left: 0; /* 重置左边距 */
-    text-indent: -15px; /* 重置文本缩进 */
+    padding-left: 0;
+    /* 重置左边距 */
+    text-indent: -15px;
+    /* 重置文本缩进 */
     display: list-item;
 }
 
@@ -144,7 +152,7 @@ blockquote {
     .welcome-section {
         padding: 20px 15px;
     }
-    
+
     .welcome-section h1 {
         font-size: 1.8rem;
     }
@@ -155,7 +163,7 @@ blockquote {
     .welcome-section {
         padding: 20px 15px;
     }
-    
+
     .welcome-section h1 {
         font-size: 1.8rem;
     }
@@ -172,7 +180,7 @@ blockquote {
     min-height: 600px;
     background: #fff;
     border-radius: 4px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 /* 修复预览区域样式 */
@@ -183,8 +191,10 @@ blockquote {
 
 /* 调整文章正文的字体大小和行高 */
 .markdown-content {
-    font-size: 1.4rem;  /* 基础字体大小 */
-    line-height: 1.8;   /* 行高 */
+    font-size: 1.4rem;
+    /* 基础字体大小 */
+    line-height: 1.8;
+    /* 行高 */
 }
 
 /* 调整 Markdown 标题间距 */
@@ -194,7 +204,8 @@ blockquote {
 .post-content h4,
 .post-content h5,
 .post-content h6 {
-    margin-bottom: 1.0rem; /* 增加标题下方间距 */
+    margin-bottom: 1.0rem;
+    /* 增加标题下方间距 */
 }
 
 /* 调整标题层级 */
@@ -230,16 +241,15 @@ blockquote {
     margin-bottom: 1.2rem;
 }
 
-/* 移除Markdown渲染中所有超链接的下划线 */
-.markdown-content a {
-    text-decoration: none;
-}
-
-article a, 
+article a,
+span a,
 .markdown-content a,
-.arithmatex a,  /* 数学公式容器内的链接 */
-.markdown-content p a,  /* 段落内的链接 */
-.meta-value a {  /* 右侧信息栏的链接 */
+.arithmatex a,
+/* 数学公式容器内的链接 */
+.markdown-content p a,
+/* 段落内的链接 */
+.meta-value a {
+    /* 右侧信息栏的链接 */
     text-decoration: none;
     color: #3498db
 }
@@ -249,7 +259,9 @@ article a,
     font-weight: bold;
     font-size: 1.2rem;
 }
-.badge-red, .badge-purple {
+
+.badge-red,
+.badge-purple {
     padding: 0.45em 0.8em;
     font-size: 50%;
     font-weight: 700;
@@ -267,23 +279,48 @@ article a,
     --color-purple: #9c3dcf;
     --color-red: #fe4c61;
     --color-blue: #3498db;
+    --color-purple-hover: #752e9b;
+    --color-red-hover: #bf3949;
+    --color-blue-hover: #2772a4;
 }
 
 /* 文字颜色类 */
-.text-purple { color: var(--color-purple); }
-.text-red { color: var(--color-red); }
-.text-blue { color: var(--color-blue); }
+.text-purple {
+    color: var(--color-purple);
+}
+
+.text-red {
+    color: var(--color-red);
+}
+
+.text-blue {
+    color: var(--color-blue);
+}
+
+.text-purple:hover {
+    color: var(--color-purple-hover);
+}
+
+.text-red:hover {
+    color: var(--color-red-hover);
+}
+.text-blue:hover {
+    color: var(--color-blue-hover);
+}
 
 /* 徽章背景颜色类 */
-.badge-purple { 
+.badge-purple {
     background-color: var(--color-purple);
-    color: white; /* 徽章文字颜色设为白色 */
+    color: white;
+    /* 徽章文字颜色设为白色 */
 }
-.badge-red { 
+
+.badge-red {
     background-color: var(--color-red);
     color: white;
 }
-.badge-blue { 
+
+.badge-blue {
     background-color: var(--color-blue);
     color: white;
 }
@@ -301,7 +338,9 @@ table {
     margin-bottom: 1rem;
     border-collapse: collapse;
 }
-th, td {
+
+th,
+td {
     padding: 0.5rem;
     border: 1px solid #dee2e6;
 }
@@ -315,7 +354,7 @@ pre code.hljs {
     font-family: 'Fira Code', monospace;
     font-size: 0.9em;
     overflow-x: auto;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
 
 /* 移除行间分隔线 */
@@ -328,7 +367,7 @@ pre code.hljs {
     border-left: none;
 }
 
-.hljs-line-numbers > .hljs-line::before {
+.hljs-line-numbers>.hljs-line::before {
     border-right: none;
     background-color: transparent;
     margin-right: 10px;
@@ -336,7 +375,7 @@ pre code.hljs {
 }
 
 /* 调整行号样式 */
-.hljs-line-numbers > .hljs-line::before {
+.hljs-line-numbers>.hljs-line::before {
     counter-increment: line;
     content: counter(line);
     display: inline-block;
@@ -363,7 +402,8 @@ pre code.hljs {
 }
 
 .hljs-ln-line {
-    line-height: 1.5;  /* 默认通常是1.2-1.5，调整为1.5-2.0 */
+    line-height: 1.5;
+    /* 默认通常是1.2-1.5，调整为1.5-2.0 */
 }
 
 /* 移除代码单元格的左边框 */
@@ -389,7 +429,8 @@ pre code.hljs {
 }
 
 .highlight table.hljs-ln {
-    margin-bottom: 0;  /* 移除表格的下边距 */
+    margin-bottom: 0;
+    /* 移除表格的下边距 */
 }
 
 /* 数学公式容器样式 */
@@ -406,7 +447,7 @@ pre code.hljs {
 }
 
 /* 复杂公式换行支持 */
-.katex-display > .katex {
+.katex-display>.katex {
     white-space: normal;
 }
 
@@ -415,15 +456,57 @@ pre code.hljs {
     max-width: 100%;
     overflow-x: auto;
 }
+
 /* 精准控制 KaTeX 的换行间距（核心解决方案） */
 .katex .newline {
-    margin-bottom: 0.5em !important;  /* 调整这个值控制行距 */
+    margin-bottom: 0.5em !important;
+    /* 调整这个值控制行距 */
     display: block;
     height: 0;
 }
 
 /* 精准控制行间公式间距 */
 .arithmatex .katex-display {
-    margin: 0.5em 0;  /* 上下边距从默认1em改为0.2em */
-    padding: 0.3em;       /* 移除内边距 */
+    margin: 0.5em 0;
+    /* 上下边距从默认1em改为0.2em */
+    padding: 0.3em;
+    /* 移除内边距 */
+}
+
+/* 卡片圆角 */
+.card {
+    border-radius: 12px;
+    /* 或者你想要的圆角大小 */
+}
+
+/* 列表项圆角 */
+.list-group.rounded {
+    border-radius: 12px;
+    overflow: hidden;
+    /* 确保子元素不破坏圆角 */
+}
+
+/* post list 板块圆角 */
+.badge {
+    border-radius: 8px;
+}
+
+.btn {
+    border-radius: 8px !important;
+    /* 自定义圆角大小 */
+}
+
+/* 卡片悬停效果 */
+.card {
+    transition: all 0.3s ease; /* 平滑过渡 */
+}
+
+.card:hover {
+    transform: translateY(-2px); /* 轻微上浮 */
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2); /* 阴影加深 */
+}
+
+/* 卡片内标题悬停变蓝 */
+.card:hover .card-title a {
+    color: #0d6efd !important; /* Bootstrap 默认蓝色 */
 }
