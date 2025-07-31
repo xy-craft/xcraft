@@ -1,7 +1,59 @@
 /* static/css/custom.css */
-/* 基础样式 */
 body {
-    background-color: #f8f9fa;
+    margin: 0;
+    min-height: 100vh;
+    position: relative;
+    overflow-x: hidden;
+    /* 使用CSS变量控制背景 */
+    background: var(--body-bg, none);
+}
+
+.background-fixed {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: -100;
+    background-image: url('/static/background.jpg');
+    background-size: cover;
+    background-position: center;
+    /* 使用变量控制显示 */
+    display: var(--bg-display, block);
+}
+
+.background-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: -99;
+    background: rgba(255,255,255,0.5);
+    /* 使用变量控制显示 */
+    display: var(--bg-display, block);
+}
+
+/* 在 static/css/custom.css 中添加 */
+.bg-switch {
+    margin-right: 0.5rem;
+    cursor: pointer;
+}
+
+/* 调整开关按钮的悬停效果 */
+.navbar-nav .form-check:hover {
+    opacity: 0.8;
+}
+
+/* 按钮悬停效果 */
+.form-check-input:hover {
+  transform: scale(1.08);
+  transition: transform 0.2s ease;
+}
+
+/* 按钮点击效果 */
+.form-check-input:active {
+  transform: scale(0.95);
 }
 
 /* Markdown内容样式 */
@@ -65,31 +117,47 @@ blockquote {
     margin-right: 1.5rem;
 }
 
-/* 移动端优化 */
-@media (max-width: 992px) {
-    .navbar-collapse {
-        padding-top: 1rem;
-    }
-
-    .navbar-nav .nav-item {
-        margin-right: 0;
-        margin-bottom: 0.5rem;
-    }
-}
 
 /* 更新欢迎板块样式 */
 .welcome-section {
     margin-top: 50px;
-    background: linear-gradient(135deg, #f7faff 0%, #f3faff 100%);
-    border-left: 4px solid #4da6ff;
-    border-radius: 8px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-    padding: 25px;
     position: relative;
-    overflow: hidden;
-    transition: all 0.3s ease;
-    /* 添加过渡动画 */
+    border-radius: 20px;
+    padding: 25px;
+    color: #333;
+    transition: transform 0.3s ease; /* 添加内容层过渡 */
+    z-index: 1;
 }
+
+/* 背景层 */
+.welcome-section::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, #f7faff 0%, #f3faff 100%);
+    border-left: 4px solid rgba(77, 166, 255, 0.7);
+    border-radius: 20px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    opacity: 0.7;
+    transition: all 0.3s ease;
+    z-index: -1;
+}
+
+/* 悬停效果 - 同时移动内容和背景 */
+.welcome-section:hover {
+    transform: translateY(-3px); /* 移动整个容器 */
+}
+
+.welcome-section:hover::before {
+    opacity: 0.85;
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
+    border-left-color: #0d6efd;
+    /* 移除伪元素的独立transform */
+}
+
 
 /* 添加文字左边距 */
 .welcome-section h1,
@@ -98,13 +166,6 @@ blockquote {
 .welcome-section li {
     padding-left: 20px;
     /* 添加统一的左边距 */
-}
-
-/* 悬停效果 */
-.welcome-section:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
-    border-left-color: #0d6efd;
 }
 
 /* 标题样式 */
@@ -147,26 +208,119 @@ blockquote {
     display: list-item;
 }
 
-/* 响应式调整 */
-@media (max-width: 768px) {
-    .welcome-section {
-        padding: 20px 15px;
-    }
-
-    .welcome-section h1 {
-        font-size: 1.8rem;
-    }
+/* 最新讨论容器 - 更透明 */
+.latest-discussions-container {
+    background-color: rgba(255, 255, 255, 0.3); /* 增加透明度 */
+    backdrop-filter: blur(5px); /* 添加毛玻璃效果 */
+    border-radius: 15px;
+    padding: 20px;
+    transition: all 0.3s ease;
+    border: 1px solid rgba(0, 0, 0, 0.05); /* 添加微妙的边框 */
 }
 
-/* 响应式调整 */
-@media (max-width: 768px) {
-    .welcome-section {
-        padding: 20px 15px;
-    }
+.latest-discussions-container:hover {
+    background-color: rgba(255, 255, 255, 0.4); /* 悬停时更不透明 */
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5); /* 悬停时阴影加深 */
+    transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1); /* 更平滑的缓动函数 */
+}
 
-    .welcome-section h1 {
-        font-size: 1.8rem;
-    }
+/* 两列布局下的卡片 */
+.post-list .post-card {
+    background: #fff;
+    border: none;
+    border-radius: 12px;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.05);
+}
+
+.post-list .post-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+}
+
+/* 确保两列布局中卡片高度一致 */
+.post-list .card-body {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+/* 标题链接 */
+.post-title-link {
+    color: #3498db;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 1.25rem;
+    transition: color 0.2s;
+    display: block;
+    margin-bottom: 0.5rem;
+}
+
+.post-title-link:hover {
+    color: #0a58ca;
+    text-decoration: underline;
+}
+
+/* 元信息样式 */
+.post-meta {
+    font-size: 0.95rem;
+    color: #666;
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 4px;
+}
+
+.meta-separator {
+    color: #999;
+    margin: 0 4px;
+}
+
+/* 分类链接 */
+.category-link {
+    color: #2c3e50;
+    font-weight: 500;
+    transition: color 0.2s;
+}
+
+.category-link:hover {
+    color: #0d6efd;
+    text-decoration: none;
+}
+
+/* 日期样式 */
+.post-date {
+    font-size: 0.9rem;
+    color: #777;
+    display: flex;
+    align-items: center;
+    margin-top: auto; /* 推到底部 */
+    border-top: 1px solid #f0f0f0; /* 添加分隔线 */
+}
+
+.post-date i {
+    margin-right: 5px;
+}
+
+/* 更紧凑的布局选项 */
+.post-card .card-body {
+    padding: 0.8rem 1.1rem;
+}
+
+.post-card .card-title {
+    margin-bottom: 0.3rem;
+    font-size: 1rem; /* 略微减小标题字号 */
+}
+
+.post-card .post-meta {
+    font-size: 0.85rem; /* 减小作者行字号 */
+}
+
+.post-card .post-date {
+    padding-top: 0.2rem;
+    margin-top: 0.2rem;
+    font-size: 0.85rem; /* 减小日期行字号 */
 }
 
 /* 所有按钮统一高度 */
@@ -268,14 +422,24 @@ span a:hover,
     color: #0a58ca
 }
 
-/* 定义多套颜色方案 */
-.author-name {
-    font-weight: bold;
-    font-size: 1.2rem;
+.badge-red,
+.badge-purple,
+.badge-blue {
+    padding: 0.45em 0.8em;
+    font-size: 50%;
+    font-weight: 700;
+    line-height: 1;
+    text-align: center;
+    white-space: nowrap;
+    vertical-align: baseline;
+    border-radius: 0.4rem;
+    display: inline-block;
+    vertical-align: middle;
 }
 
-.badge-red,
-.badge-purple {
+.badge-red-small,
+.badge-purple-small,
+.badge-blue-small {
     padding: 0.45em 0.8em;
     font-size: 50%;
     font-weight: 700;
@@ -323,27 +487,47 @@ span a:hover,
 }
 
 /* 徽章背景颜色类 */
-.badge-purple {
+.badge-purple,
+.badge-purple-small {
     background-color: var(--color-purple);
     color: white;
     /* 徽章文字颜色设为白色 */
 }
 
-.badge-red {
+.badge-red,
+.badge-red-small {
     background-color: var(--color-red);
     color: white;
 }
 
-.badge-blue {
+.badge-blue,
+.badge-blue-small {
     background-color: var(--color-blue);
     color: white;
 }
 
 /* 调整徽章位置 */
-.author-name .badge {
+.author-name .badge{
     position: relative;
     top: -0.1em;
     margin-left: 0.3em;
+}
+
+/* 定义多套颜色方案 */
+.author-name {
+    font-weight: bold;
+    font-size: 1.2rem;
+}
+
+.author-name-small .badge-small{
+    position: relative;
+    top: -0.1em;
+    margin-left: 0.3em;
+}
+
+.author-name-small {
+    font-weight: bold;
+    font-size: 1.0rem;
 }
 
 /* 添加表格基本样式 */

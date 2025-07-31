@@ -3,6 +3,27 @@
 <html lang="zh-CN">
 
 <head>
+    <script>
+        // 立即读取并设置背景状态（不等待DOM加载）
+        window.bgState = localStorage.getItem('bgState');
+        if (window.bgState === null) window.bgState = 'on'; // 默认开启
+
+        // 立即设置CSS变量
+        document.documentElement.style.setProperty('--bg-display', window.bgState === 'on' ? 'block' : 'none');
+        document.documentElement.style.setProperty('--body-bg', window.bgState === 'on' ? 'none' : '#efefef');
+    </script>
+    <script>
+        // 立即设置初始状态，无需等待DOM加载
+        document.documentElement.style.setProperty(
+            '--bg-display',
+            localStorage.getItem('bgState') === 'off' ? 'none' : 'block'
+        );
+
+        document.documentElement.style.setProperty(
+            '--body-bg',
+            localStorage.getItem('bgState') === 'off' ? '#efefef' : 'none'
+        );
+    </script>
 
     <!-- 基础元数据 -->
     <meta charset="UTF-8">
@@ -44,16 +65,44 @@
         html {
             overflow-y: scroll;
             scrollbar-gutter: stable;
+            /* 添加平滑滚动 */
+            scroll-behavior: smooth;
         }
 
         body {
-            background-color: #efefef;
+            /* 只保留必要的样式 */
             padding-bottom: 2rem;
+            /* 禁用文字抗锯齿以获得更好的性能 */
+            -webkit-font-smoothing: subpixel-antialiased;
+        }
+    </style>
+    <style>
+        /* 强制保护层 */
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body>.background-fixed {
+            position: fixed !important;
+            background-attachment: fixed !important;
+        }
+
+        /* 禁用某些浏览器的怪异行为 */
+        @supports (-webkit-overflow-scrolling: touch) {
+            body {
+                overflow: hidden;
+                height: 100%;
+            }
         }
     </style>
 </head>
 
 <body>
+
+    <!-- 新增背景元素（放在body最前面） -->
+    <div class="background-fixed"></div>
+    <div class="background-overlay"></div>
+
     {% include 'navbar.html' %}
 
     <main class="container mt-4">
@@ -117,6 +166,51 @@
             });
         });
     </script>
+
+    <head>
+        <!-- 在head最顶部添加内联JS -->
+
+
+        <!-- 其他head内容不变 -->
+    </head>
+
+    <body>
+        <!-- 背景元素 -->
+        <div class="background-fixed"></div>
+        <div class="background-overlay"></div>
+
+        <!-- 其他内容 -->
+
+        <script>
+            // 在页面底部添加切换逻辑
+            document.addEventListener('DOMContentLoaded', function () {
+                const bgToggle = document.getElementById('bgToggle');
+                if (!bgToggle) return;
+
+                // 初始化按钮状态
+                bgToggle.checked = localStorage.getItem('bgState') !== 'off';
+
+                // 切换事件
+                bgToggle.addEventListener('change', function () {
+                    const isOn = this.checked;
+
+                    // 更新CSS变量
+                    document.documentElement.style.setProperty(
+                        '--bg-display',
+                        isOn ? 'block' : 'none'
+                    );
+
+                    document.documentElement.style.setProperty(
+                        '--body-bg',
+                        isOn ? 'none' : '#efefef'
+                    );
+
+                    // 保存状态
+                    localStorage.setItem('bgState', isOn ? 'on' : 'off');
+                });
+            });
+        </script>
+    </body>
     {% block scripts %}{% endblock %}
 </body>
 

@@ -222,12 +222,7 @@ def post_edit_required(f):
 def datetimeformat(value, format='%Y-%m-%d %H:%M'):
     if value is None:
         return ""
-    
-    # 转换为北京时间
-    utc_time = value.replace(tzinfo=pytz.utc)
-    beijing_time = utc_time.astimezone(pytz.timezone('Asia/Shanghai'))
-    
-    return beijing_time.strftime(format)
+    return value.strftime(format)
 
 # 注册过滤器到Jinja环境
 app.jinja_env.filters['datetimeformat'] = datetimeformat
@@ -255,7 +250,7 @@ def index():
     welcome_html = markdown.markdown(welcome_content, extras=["latex"])
 
     # 原有的最新文章查询保持不变
-    posts = Post.query.order_by(Post.created_at.desc()).limit(5).all()
+    posts = Post.query.order_by(Post.created_at.desc()).limit(8).all()
     
     return render_template('index.html', 
                          posts=posts,
@@ -775,4 +770,4 @@ def upload_file():
 if __name__ == '__main__':
     with app.app_context():
         db.create_all()
-    app.run(debug=True)
+    app.run(host='0.0.0.0', debug=True)

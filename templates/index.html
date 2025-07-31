@@ -1,4 +1,3 @@
-<!-- templates/index.html -->
 {% extends "base.html" %}
 
 {% block content %}
@@ -8,31 +7,56 @@
 </section>
 
 <!-- 最新文章板块 -->
-<h2 id="latest-posts" class="mb-4">最新文章</h2>
-{% for post in posts %}
-<div class="card mb-3">
-        <div class="card-body">
-            <div class="d-flex justify-content-between align-items-center"> <!-- 水平布局 -->
-                <!-- 左侧内容 -->
-                <div class="d-flex flex-column justify-content-center me-3">
-                    <h5 class="card-title mb-2">{{ post.title }}</h5>
-                    <p class="text-muted small mb-0">
-                        分类：{{ post.category }} |
-                        作者：{{ post.author.username }} |
-                        发布于：{{ post.created_at.strftime('%Y-%m-%d') }}
-                    </p>
-                </div>
-
-                <!-- 右侧按钮组 -->
-                <div class="d-flex gap-2 align-items-center">
-                    <a href="{{ url_for('show_post', post_id=post.id) }}" class="btn btn-primary btn-sm">
-                        阅读全文
-                    </a>
+<div class="latest-discussions-container mb-5">
+    <h3 id="latest-posts" class="mb-4">最近讨论</h3>
+    <div class="row post-list"> <!-- 添加两列布局的row -->
+        {% for post in posts %}
+        <div class="col-lg-6 mb-3"> <!-- 每个文章占6列 -->
+            <div class="post-card card h-100"> <!-- 添加高度100% -->
+                <div class="card-body">
+                    <!-- 标题行 -->
+                    <h5 class="card-title">
+                        <a href="{{ url_for('show_post', post_id=post.id) }}" class="post-title-link">{{ post.title }}</a>
+                    </h5>
+                    
+                    <!-- 作者和分类行 -->
+                    <div class="post-meta mb-1">
+                        <span class="author-name-small">
+                            <a href="{{ url_for('user_detail', uid=post.author.id) }}"
+                                class="{% if post.author.is_admin %}text-purple{% elif post.author.can_post %}text-red{% else %}text-blue{% endif %}">
+                                {{ post.author.username }}
+                            </a>
+                            {% if post.author.can_post %}
+                            <span class="badge-small badge-red-small">管理员</span>
+                            {% endif %}
+                            {% if post.author.is_admin %}
+                            <span class="badge-small badge-purple-small">超管</span>
+                            {% endif %}
+                        </span>
+                        <span class="meta-separator">In</span>
+                        <span class="post-category">
+                            <a href="{{ url_for('category', category=post.category) }}" class="category-link">
+                                {% if post.category == 'OI' %}OI 学习
+                                {% elif post.category == 'study' %}文化课学习
+                                {% elif post.category == 'relax' %}休闲娱乐
+                                {% elif post.category == 'announce' %}站务板
+                                {% else %}{{ post.category }}{% endif %}
+                            </a>
+                        </span>
+                    </div>
+                    
+                    <!-- 日期行 -->
+                    <div class="post-date">
+                        <i class="bi bi-clock"></i> @{{ post.created_at.strftime('%Y-%m-%d') }}
+                    </div>
                 </div>
             </div>
+        </div> <!-- 结束列 -->
+        {% else %}
+        <div class="col-12">
+            <div class="alert alert-warning">暂无文章</div>
         </div>
-    </div>
-{% else %}
-<div class="alert alert-warning">暂无文章</div>
-{% endfor %}
+        {% endfor %}
+    </div> <!-- 结束行 -->
+</div>
 {% endblock %}
