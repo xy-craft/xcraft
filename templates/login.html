@@ -14,6 +14,11 @@
                     <label class="form-label">密码</label>
                     <input type="password" name="password" class="form-control" required>
                 </div>
+                <!-- 修改这里：添加 checked 属性 -->
+                <div class="mb-3 form-check">
+                    <input type="checkbox" name="remember" id="remember" class="form-check-input" checked>
+                    <label class="form-check-label" for="remember">14天内无需再登录</label>
+                </div>
                 {% if error %}
                     <div class="alert alert-danger mb-3">{{ error }}</div>
                 {% endif %}

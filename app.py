@@ -29,6 +29,7 @@ app.config.from_pyfile('config.py')
 db = SQLAlchemy(app)
 app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 24 * 60 * 60  # 24小时
 app.config['TIMEZONE'] = 'Asia/Shanghai'
+app.config['REMEMBER_COOKIE_DURATION'] = timedelta(days=14)  # 登录14天有效期
 
 # 在这里注册模板过滤器
 # 简化 Markdown 配置，移除 codehilite
@@ -744,10 +745,11 @@ def login():
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
+        remember = 'remember' in request.form  # 检查是否勾选"记住我"
         user = User.query.filter_by(username=username).first()
         
         if user and check_password_hash(user.password, password):
-            login_user(user)
+            login_user(user, remember=remember)  # 传递remember参数
             return redirect(url_for('index'))
         return render_template('login.html', error='用户名或密码错误')
     

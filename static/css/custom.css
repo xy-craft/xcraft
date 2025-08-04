@@ -15,21 +15,9 @@ body {
     width: 100vw;
     height: 100vh;
     z-index: -100;
-    background-image: url('/static/background.jpg');
+    background-image: url('https://free.picui.cn/free/2025/08/04/68905106a1f23.jpg');
     background-size: cover;
     background-position: center;
-    /* 使用变量控制显示 */
-    display: var(--bg-display, block);
-}
-
-.background-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
-    z-index: -99;
-    background: rgba(255,255,255,0.5);
     /* 使用变量控制显示 */
     display: var(--bg-display, block);
 }
