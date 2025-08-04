@@ -101,11 +101,10 @@
 
     <!-- 新增背景元素（放在body最前面） -->
     <div class="background-fixed"></div>
-    <div class="background-overlay"></div>
 
     {% include 'navbar.html' %}
 
-    <main class="container mt-4">
+    <main class="container" style="padding-top: 90px">
         {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}
         {% for category, message in messages %}
@@ -167,50 +166,37 @@
         });
     </script>
 
-    <head>
-        <!-- 在head最顶部添加内联JS -->
+    <!-- 其他内容 -->
 
+    <script>
+        // 在页面底部添加切换逻辑
+        document.addEventListener('DOMContentLoaded', function () {
+            const bgToggle = document.getElementById('bgToggle');
+            if (!bgToggle) return;
 
-        <!-- 其他head内容不变 -->
-    </head>
+            // 初始化按钮状态
+            bgToggle.checked = localStorage.getItem('bgState') !== 'off';
 
-    <body>
-        <!-- 背景元素 -->
-        <div class="background-fixed"></div>
-        <div class="background-overlay"></div>
+            // 切换事件
+            bgToggle.addEventListener('change', function () {
+                const isOn = this.checked;
 
-        <!-- 其他内容 -->
+                // 更新CSS变量
+                document.documentElement.style.setProperty(
+                    '--bg-display',
+                    isOn ? 'block' : 'none'
+                );
 
-        <script>
-            // 在页面底部添加切换逻辑
-            document.addEventListener('DOMContentLoaded', function () {
-                const bgToggle = document.getElementById('bgToggle');
-                if (!bgToggle) return;
+                document.documentElement.style.setProperty(
+                    '--body-bg',
+                    isOn ? 'none' : '#efefef'
+                );
 
-                // 初始化按钮状态
-                bgToggle.checked = localStorage.getItem('bgState') !== 'off';
-
-                // 切换事件
-                bgToggle.addEventListener('change', function () {
-                    const isOn = this.checked;
-
-                    // 更新CSS变量
-                    document.documentElement.style.setProperty(
-                        '--bg-display',
-                        isOn ? 'block' : 'none'
-                    );
-
-                    document.documentElement.style.setProperty(
-                        '--body-bg',
-                        isOn ? 'none' : '#efefef'
-                    );
-
-                    // 保存状态
-                    localStorage.setItem('bgState', isOn ? 'on' : 'off');
-                });
+                // 保存状态
+                localStorage.setItem('bgState', isOn ? 'on' : 'off');
             });
-        </script>
-    </body>
+        });
+    </script>
     {% block scripts %}{% endblock %}
 </body>
 
