@@ -104,7 +104,7 @@
 
     {% include 'navbar.html' %}
 
-    <main class="container" style="padding-top: 90px">
+    <main class="container mt-4">
         {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}
         {% for category, message in messages %}
@@ -165,9 +165,6 @@
             });
         });
     </script>
-
-    <!-- 其他内容 -->
-
     <script>
         // 在页面底部添加切换逻辑
         document.addEventListener('DOMContentLoaded', function () {

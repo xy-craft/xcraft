@@ -258,7 +258,7 @@ def index():
                          welcome_html=welcome_html)  # 新增参数
 
 # 分类路由
-@app.route('/category/<category>')
+@app.route('/discuss/<category>')
 def category(category):
     # 获取分类名称映射
     category_names = {
@@ -296,7 +296,7 @@ def category(category):
                          current_category=current_category_name,
                          current_category_id=category)  # 添加当前分类ID
 
-@app.route('/post/<int:post_id>')
+@app.route('/discuss/<int:post_id>')
 def show_post(post_id):
     post = Post.query.get_or_404(post_id)
     # 双重处理：先escape再markdown
@@ -325,7 +325,7 @@ def user_detail(uid):
                          posts=posts)
 
 # 讨论区主页面路由
-@app.route('/category/')
+@app.route('/discuss/')
 def discuss():
     # 获取所有文章（按时间倒序）
     posts = Post.query.order_by(Post.created_at.desc()).all()
@@ -401,18 +401,79 @@ def admin_dashboard():
 def admin_redirect():
     return redirect(url_for('admin_dashboard'))
 
+# 后台讨论区主页面 (显示所有文章)
+@app.route('/admin/discuss/')
+@login_required
+@admin_required
+def admin_discuss():
+    # 获取所有文章（按时间倒序）
+    posts = Post.query.order_by(Post.created_at.desc()).all()
+    
+    # 定义板块列表
+    categories = [
+        {'id': '', 'name': '全部板块', 'active': True},
+        {'id': 'announce', 'name': '站务板', 'active': False},
+        {'id': 'OI', 'name': 'OI 学习', 'active': False},
+        {'id': 'study', 'name': '文化课学习', 'active': False},
+        {'id': 'relax', 'name': '休闲娱乐', 'active': False}
+    ]
+    
+    # 计算每个板块的文章数量
+    for cat in categories:
+        if cat['id'] == '':
+            cat['count'] = len(posts)
+        else:
+            cat['count'] = Post.query.filter_by(category=cat['id']).count()
+    
+    return render_template('admin/discuss.html', 
+                         posts=posts, 
+                         categories=categories, 
+                         current_category='全部板块',
+                         current_category_id='')
+
 # 后台分类管理路由
-@app.route('/admin/category/<category>')
+@app.route('/admin/discuss/<category>')
 @login_required
 @admin_required
 def admin_category(category):
+    # 分类名称映射
+    category_names = {
+        'OI': 'OI 学习',
+        'study': '文化课学习',
+        'relax': '休闲娱乐',
+        'announce': '站务板'
+    }
+    
+    # 获取当前分类名称
+    current_category_name = category_names.get(category, category)
+    
+    # 获取文章
     posts = Post.query.filter_by(category=category).order_by(Post.created_at.desc()).all()
-    return render_template('admin/category.html', 
+    
+    # 定义板块列表
+    categories = [
+        {'id': '', 'name': '全部板块', 'active': False},
+        {'id': 'announce', 'name': '站务板', 'active': category == 'announce'},
+        {'id': 'OI', 'name': 'OI 学习', 'active': category == 'OI'},
+        {'id': 'study', 'name': '文化课学习', 'active': category == 'study'},
+        {'id': 'relax', 'name': '休闲娱乐', 'active': category == 'relax'}
+    ]
+    
+    # 计算文章数量
+    for cat in categories:
+        if cat['id'] == '':
+            cat['count'] = Post.query.count()
+        else:
+            cat['count'] = Post.query.filter_by(category=cat['id']).count()
+    
+    return render_template('admin/discuss.html', 
                          posts=posts,
-                         category=category)
+                         categories=categories,
+                         current_category=current_category_name,
+                         current_category_id=category)
 
 # 后台文章展示路由
-@app.route('/admin/post/<int:post_id>')
+@app.route('/admin/discuss/<int:post_id>')
 @login_required
 @admin_required
 def admin_show_post(post_id):
@@ -420,7 +481,7 @@ def admin_show_post(post_id):
     return render_template('admin/post.html', post=post, content=escape(post.content))
 
 # 后台文章删除路由
-@app.route('/admin/post/delete/<int:post_id>')
+@app.route('/admin/discuss/delete/<int:post_id>')
 @login_required
 @admin_required
 def admin_delete_post(post_id):
@@ -430,7 +491,7 @@ def admin_delete_post(post_id):
     return redirect(url_for('admin_category', category=post.category))
 
 # 后台文章编辑路由
-@app.route('/admin/post/edit/<int:post_id>', methods=['GET', 'POST'])
+@app.route('/admin/discuss/edit/<int:post_id>', methods=['GET', 'POST'])
 @login_required
 @admin_required
 def admin_edit_post(post_id):
@@ -443,19 +504,11 @@ def admin_edit_post(post_id):
         return redirect(url_for('admin_category', category=post.category))
     return render_template('admin/post_edit.html', post=post)
 
-# 后台文章路由列表
-@app.route('/admin/posts')
-@login_required
-@admin_required
-def manage_posts():
-    posts = Post.query.order_by(Post.created_at.desc()).all()
-    return render_template('admin/post_list.html', posts=posts)
-
 # 新建文章
-@app.route('/admin/post/new', methods=['GET', 'POST'])
+@app.route('/admin/discuss/new', methods=['GET', 'POST'])
 @login_required
 @admin_required
-def new_post():
+def admin_new_post():
     if request.method == 'POST':
         # 保持原有提交逻辑不变
         title = request.form['title']
@@ -470,7 +523,7 @@ def new_post():
         )
         db.session.add(new_post)
         db.session.commit()
-        return redirect(url_for('manage_posts'))
+        return redirect(url_for('admin_category', category=category))
     
     # 获取默认分类（新增代码）
     default_category = request.args.get('default_category', 'OI')  # 从URL参数获取
@@ -486,7 +539,7 @@ def new_post():
     )
 
 # 新建文章
-@app.route('/post/new', methods=['GET', 'POST'])
+@app.route('/discuss/new', methods=['GET', 'POST'])
 @login_required
 @post_edit_required
 def user_new_post():
@@ -520,14 +573,14 @@ def user_new_post():
     )
 
 # 删除文章
-@app.route('/admin/post/delete/<int:post_id>')
+@app.route('/admin/discuss/delete/<int:post_id>')
 @login_required
 @admin_required
 def delete_post(post_id):
     post = Post.query.get_or_404(post_id)
     db.session.delete(post)
     db.session.commit()
-    return redirect(url_for('manage_posts'))
+    return redirect(url_for('admin_category', category=category))
 
 # 用户列表路由
 @app.route('/admin/user')
