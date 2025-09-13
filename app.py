@@ -236,6 +236,10 @@ def index():
     welcome_content = """
 # Welcome to『 Xcraft 』
 
+> Xcraft —— Where Ideas Craft Stars
+>
+> 星创 —— 星之所向 创想无界
+
 欢迎来到 xuyang 的 blog！
 
 这是一个专注于 **算法竞赛** 与 **学习分享** 的技术博客，主要包含：

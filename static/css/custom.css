@@ -160,7 +160,7 @@ blockquote {
 .welcome-section h1 {
     color: #0e6de9;
     font-size: 2.3rem;
-    margin-bottom: 1.2rem;
+    margin-bottom: 0.8rem;
     position: relative;
 }
 
@@ -171,6 +171,7 @@ blockquote {
     color: #444;
 }
 
+/* 粗体样式 */
 .welcome-section strong {
     color: #0e6de9;
     font-weight: 600;
@@ -183,6 +184,23 @@ blockquote {
     /* 明确指定列表样式 */
     list-style-position: outside;
     /* 确保标记点在文本外部 */
+}
+
+/* 引用样式 */
+.welcome-section blockquote {
+    /* border-left: 4px solid rgba(77, 166, 255, 0.7); 蓝色边框 */
+    /* background-color: rgba(240, 248, 255, 0.6); 浅蓝色背景 */
+    /* border-radius: 0 8px 8px 0; 圆角，右上和右下有圆角，左下和左上没有（因为左边框是直的） */
+    padding: 5px 20px 5px 20px; /* 内边距，文字与边框的距离 */
+    margin: 0px 0 15px 20px; /* 上右下左，左边距20px使整个引用右移 */
+    
+    /* font-style: italic; */
+}
+
+.welcome-section blockquote p {
+    margin: 0; /* 移除段落的默认边距 */
+    padding: 5px 0; /* 如果需要段落之间的间距，使用padding */
+    color: #919191;
 }
 
 .welcome-section li {
