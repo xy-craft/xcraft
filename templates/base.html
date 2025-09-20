@@ -96,9 +96,71 @@
             }
         }
     </style>
+    <style>
+        /* 页面过渡动画 */
+        .page-transition {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #6e8efb, #a777e3);
+            z-index: 9999;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+
+        .page-transition.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .transition-content {
+            text-align: center;
+            color: white;
+        }
+
+        .loader {
+            width: 50px;
+            height: 50px;
+            margin: 0 auto 20px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .transition-content h3 {
+            margin-bottom: 10px;
+            font-weight: 500;
+        }
+
+        .transition-content p {
+            opacity: 0.8;
+            font-size: 0.9rem;
+        }
+    </style>
 </head>
 
 <body>
+    <!-- 页面过渡界面 -->
+    <div class="page-transition" id="page-transition">
+        <div class="transition-content">
+            <div class="loader"></div>
+            <h3>Xcraft</h3>
+            <p>星之所向 创想无界</p>
+        </div>
+    </div>
 
     <!-- 新增背景元素（放在body最前面） -->
     <div class="background-fixed"></div>
@@ -155,6 +217,10 @@
     <script>
         // 全局AJAX导航功能
         document.addEventListener('DOMContentLoaded', function () {
+            // 获取过渡元素
+            const transitionElement = document.getElementById('page-transition');
+            let isTransitionActive = false;
+
             // 高亮和数学公式渲染函数
             function renderContent() {
                 // 高亮所有代码块
@@ -184,19 +250,41 @@
             const loadingBar = document.getElementById('loading-bar');
             let loadingTimeout;
 
+            // 显示过渡界面
+            function showTransition() {
+                isTransitionActive = true;
+                transitionElement.classList.add('active');
+            }
+
+            // 隐藏过渡界面
+            function hideTransition() {
+                isTransitionActive = false;
+                transitionElement.classList.remove('active');
+            }
+
             function startLoading() {
                 clearTimeout(loadingTimeout);
                 loadingBar.style.width = '30%';
                 loadingTimeout = setTimeout(() => {
                     loadingBar.style.width = '70%';
                 }, 300);
+
+                // 显示过渡界面
+                showTransition();
             }
 
             function finishLoading() {
                 clearTimeout(loadingTimeout);
                 loadingBar.style.width = '100%';
+                // 进度条完成后不立即隐藏过渡界面，等待内容渲染完成
+            }
+
+            // 内容渲染完成后调用此函数
+            function completeTransition() {
                 setTimeout(() => {
                     loadingBar.style.width = '0';
+                    // 隐藏过渡界面
+                    setTimeout(hideTransition, 300);
                 }, 300);
             }
 
@@ -232,8 +320,11 @@
 
             // 导航函数
             function navigateTo(url) {
-                history.pushState({ url: url }, '', url);
-                loadPage(url, true);
+                // 添加一个小的延迟，让过渡动画有足够时间显示
+                setTimeout(() => {
+                    history.pushState({ url: url }, '', url);
+                    loadPage(url, true);
+                }, 50);
             }
 
             // 加载页面内容
@@ -251,7 +342,6 @@
                 })
                     .then(response => {
                         if (!response.ok) {
-                            // 如果AJAX请求失败，回退到传统页面加载
                             window.location.href = url;
                             throw new Error('AJAX request failed');
                         }
@@ -262,6 +352,12 @@
                         const contentMatch = html.match(/<main\s+[^>]*id="main-content"[^>]*>([\s\S]*?)<\/main>/i);
 
                         if (contentMatch && contentMatch[1]) {
+                            // 在替换内容前，先恢复默认的过渡消息
+                            const messageElement = document.querySelector('.transition-content p');
+                            if (messageElement) {
+                                messageElement.textContent = '星之所向 创想无界';
+                            }
+
                             // 替换主内容区域
                             document.getElementById('main-content').innerHTML = contentMatch[1];
 
@@ -281,16 +377,22 @@
                             if (typeof bindEvents === 'function') {
                                 setTimeout(bindEvents, 150);
                             }
-                        } else {
-                            // 如果没有找到内容，回退到传统页面加载
-                            window.location.href = url;
-                        }
 
-                        finishLoading();
+                            // 标记加载完成
+                            finishLoading();
+
+                            // 完成过渡（等待渲染完成）
+                            completeTransition();
+                        } else {
+                            window.location.href = url;
+                            return Promise.reject('No content found');
+                        }
                     })
                     .catch(error => {
                         console.error('AJAX navigation error:', error);
+                        // 即使出错也要完成过渡
                         finishLoading();
+                        completeTransition();
                     });
             }
 

@@ -1,0 +1,282 @@
+<!-- templates/post.html -->
+{% extends "base.html" %}
+
+{% block title %}{{ post.title }} - Xcraft | 星之所向 创想无界{% endblock %}
+
+{% block content %}
+<article class="post-container">
+    <!-- 标题保持不变 -->
+    <h1 class="post-title">{{ post.title }}</h1>
+
+    <!-- 双栏信息容器 -->
+    <div class="post-meta-container">
+        <!-- 左侧内容区 (3份) -->
+        <div class="post-content-main">
+            <div class="author-info">
+                <span class="author-name">
+                    <strong>
+                        <a href="{{ url_for('user_detail', uid=post.author.id) }}"
+                            class="{% if post.author.is_admin %}text-purple{% elif post.author.can_post %}text-red{% else %}text-blue{% endif %}">
+                            {{ post.author.username }}
+                        </a>
+                    </strong>
+                    {% if post.author.can_post %}
+                    <span class="badge badge-red">管理员</span>
+                    {% endif %}
+                    {% if post.author.is_admin %}
+                    <span class="badge badge-purple">超管</span>
+                    {% endif %}
+                </span>
+                <span class="publish-date">发表于 {{ post.created_at|datetimeformat }}</span>
+            </div>
+
+            <!-- 文章内容 -->
+            <div class="post-content">
+                {{ post.content|markdown|safe }}
+            </div>
+        </div>
+
+        <!-- 右侧信息区 (1份) -->
+        <div class="post-meta-info">
+            <div class="meta-row">
+                <span class="meta-label">创建者</span>
+                <span class="author-name">
+                    <strong>
+                        <a href="{{ url_for('user_detail', uid=post.author.id) }}"
+                            class="{% if post.author.is_admin %}text-purple{% elif post.author.can_post %}text-red{% else %}text-blue{% endif %}">
+                            {{ post.author.username }}
+                        </a>
+                    </strong>
+                    {% if post.author.can_post %}
+                    <span class="badge badge-red">管理员</span>
+                    {% endif %}
+                    {% if post.author.is_admin %}
+                    <span class="badge badge-purple">超管</span>
+                    {% endif %}
+                </span>
+            </div>
+            <div class="meta-row">
+                <span class="meta-label">发帖时间</span>
+                <span class="meta-value">{{ post.created_at|datetimeformat }}</span>
+            </div>
+            <div class="meta-row">
+                <span class="meta-label">所属板块</span>
+                <span class="meta-value">
+                    <a href="{{ url_for('category', category=post.category) }}" class="category-link">
+                        {% if post.category == 'OI' %}OI 学习
+                        {% elif post.category == 'study' %}文化课学习
+                        {% elif post.category == 'relax' %}休闲娱乐
+                        {% elif post.category == 'announce' %}站务板
+                        {% else %}{{ post.category }}{% endif %}
+                    </a>
+                </span>
+            </div>
+        </div>
+    </div>
+
+    <!-- 返回按钮 -->
+    <div class="post-footer">
+        <a href="{{ url_for('category', category=post.category) }}" class="btn btn-outline-secondary">
+            <i class="bi bi-arrow-left"></i> 返回文章列表
+        </a>
+    </div>
+</article>
+{% endblock %}
+
+{% block styles %}
+<style>
+    /* 文章容器 */
+    .post-container {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 0rem;
+    }
+
+    /* 文章标题 */
+    .post-title {
+
+        margin-top: 2.5rem;
+        /* 增加上边距 */
+        margin-bottom: 0rem;
+        /* 减少下边距 */
+        font-size: 2.2rem;
+        margin-bottom: 2rem;
+        color: #333;
+        font-weight: 600;
+        padding-bottom: 0rem;
+    }
+
+    /* 双栏布局容器 */
+    .post-meta-container {
+        display: flex;
+        gap: 2rem;
+        margin-bottom: 2rem;
+    }
+
+    /* 左侧主内容区 */
+    .post-content-main {
+        flex: 3.5;
+        background: #fff;
+        padding: 1.5rem;
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    }
+
+    /* 作者信息 */
+    .author-info {
+        margin-bottom: 1.5rem;
+        padding-bottom: 1rem;
+        border-bottom: 1px solid #f0f0f0;
+    }
+
+    .author-label {
+        display: block;
+        font-size: 0.9rem;
+        color: #666;
+        margin-bottom: 0.3rem;
+    }
+
+    .author-name {
+        top: -3px;
+        font-size: 1.2rem;
+        font-weight: 500;
+        color: #333;
+    }
+
+    .publish-date {
+        display: block;
+        font-size: 0.9rem;
+        color: #888;
+        margin-top: 0.3rem;
+    }
+
+    /* 文章内容 */
+    .post-content {
+        line-height: 1.8;
+        font-size: 1.1rem;
+        color: #444;
+    }
+
+    /* 右侧元信息区 */
+    .post-meta-info {
+
+        /* 移除原有的行间距和分割线样式 */
+        .meta-row {
+            padding: 0.4rem 0;
+            /* 减小行距 */
+            border-bottom: none !important;
+            /* 移除横线分隔 */
+            display: flex;
+            justify-content: space-between;
+        }
+
+        /* 调整标签和值的间距 */
+        .meta-label {
+            margin-right: 1rem;
+            /* 增加标签和值之间的间距 */
+        }
+
+        flex: 1;
+        background: #fff;
+        padding: 1.5rem;
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        align-self: flex-start;
+        /* 使右侧栏高度由内容决定 */
+    }
+
+    .post-meta-info .author-name {
+        position: relative;
+        top: -3px;
+    }
+
+    .meta-row {
+        display: flex;
+        justify-content: space-between;
+        padding: 0.8rem 0;
+        border-bottom: 1px solid #f5f5f5;
+    }
+
+    .meta-row:last-child {
+        border-bottom: none;
+    }
+
+    .meta-label {
+        color: #666;
+        font-size: 0.95rem;
+    }
+
+    .meta-value {
+        color: #333;
+        font-weight: 500;
+    }
+
+    /* 底部按钮 */
+    .post-footer {
+        text-align: center;
+        margin-top: 2rem;
+    }
+
+    /* 响应式设计 */
+    @media (max-width: 768px) {
+        .post-meta-container {
+            flex-direction: column;
+        }
+
+        .post-content-main,
+        .post-meta-info {
+            flex: none;
+            width: 100%;
+        }
+    }
+
+    /* 保留原有数学公式样式 */
+    .katex-display {
+        overflow-x: auto;
+        overflow-y: hidden;
+        padding: 1rem 0;
+        margin: 1.5rem 0;
+    }
+
+    .katex {
+        font-size: 1.1em;
+    }
+
+    .katex-display>.katex {
+        white-space: normal;
+    }
+
+    .math-container {
+        max-width: 100%;
+        overflow-x: auto;
+    }
+
+    /* 图片响应式处理 */
+    .post-content-main img {
+        max-width: 100%;
+        height: auto;
+        display: block;
+        margin: 1.5rem auto;
+        border-radius: 4px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    /* 限制超大图片的显示 */
+    .post-content-main {
+        overflow: hidden;
+        /* 防止内容溢出 */
+    }
+
+    /* 为图片添加标题样式 */
+    .post-content-main figure {
+        margin: 1.5rem 0;
+        text-align: center;
+    }
+
+    .post-content-main figcaption {
+        font-size: 0.9rem;
+        color: #666;
+        margin-top: 0.5rem;
+    }
+</style>
+{% endblock %}
