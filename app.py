@@ -257,6 +257,13 @@ def index():
     # 原有的最新文章查询保持不变
     posts = Post.query.order_by(Post.created_at.desc()).limit(8).all()
     
+    # 检查是否是 AJAX 请求
+    if request.args.get('ajax') == '1':
+        # 返回页面内容片段
+        return render_template('index.html', 
+                             posts=posts,
+                             welcome_html=welcome_html)
+    
     return render_template('index.html', 
                          posts=posts,
                          welcome_html=welcome_html)  # 新增参数
@@ -294,6 +301,15 @@ def category(category):
         else:
             cat['count'] = Post.query.filter_by(category=cat['id']).count()
     
+    # 检查是否是 AJAX 请求
+    if request.args.get('ajax') == '1':
+        # 返回页面内容片段
+        return render_template('discuss.html', 
+                             posts=posts, 
+                             categories=categories, 
+                             current_category=current_category_name,
+                             current_category_id=category)
+    
     return render_template('discuss.html', 
                          posts=posts, 
                          categories=categories, 
@@ -308,6 +324,12 @@ def show_post(post_id):
         escape(post.content),
         extensions=['fenced_code', 'tables']
     )
+    
+    # 检查是否是 AJAX 请求
+    if request.args.get('ajax') == '1':
+        # 返回页面内容片段
+        return render_template('post.html', post=post, content=safe_content)
+    
     return render_template('post.html', post=post, content=safe_content)
 
 # 用户列表路由
@@ -315,6 +337,12 @@ def show_post(post_id):
 @login_required
 def user_list():
     users = User.query.order_by(User.reg_date.desc()).all()
+    
+    # 检查是否是 AJAX 请求
+    if request.args.get('ajax') == '1':
+        # 返回页面内容片段
+        return render_template('user_list.html', users=users)
+    
     return render_template('user_list.html', users=users)
 
 # 用户详情路由
@@ -324,6 +352,14 @@ def user_detail(uid):
     user = User.query.get_or_404(uid)
     # 获取用户最近发布的100篇文章
     posts = Post.query.filter_by(user_id=uid).order_by(Post.created_at.desc()).limit(100).all()
+    
+    # 检查是否是 AJAX 请求
+    if request.args.get('ajax') == '1':
+        # 返回页面内容片段
+        return render_template('user_detail.html', 
+                             user=user,
+                             posts=posts)
+    
     return render_template('user_detail.html', 
                          user=user,
                          posts=posts)
@@ -349,6 +385,15 @@ def discuss():
             cat['count'] = len(posts)
         else:
             cat['count'] = Post.query.filter_by(category=cat['id']).count()
+    
+    # 检查是否是 AJAX 请求
+    if request.args.get('ajax') == '1':
+        # 返回页面内容片段
+        return render_template('discuss.html', 
+                             posts=posts, 
+                             categories=categories, 
+                             current_category='全部板块',
+                             current_category_id='')
     
     return render_template('discuss.html', 
                          posts=posts, 

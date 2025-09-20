@@ -103,9 +103,14 @@
     <!-- 新增背景元素（放在body最前面） -->
     <div class="background-fixed"></div>
 
+    <!-- 添加加载指示器 -->
+    <div id="loading-bar"
+        style="position:fixed;top:0;left:0;width:0;height:3px;background:#007bff;z-index:9999;transition:width 0.3s ease;">
+    </div>
+
     {% include 'navbar.html' %}
 
-    <main class="container mt-4">
+    <main class="container mt-4" id="main-content">
         {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}
         {% for category, message in messages %}
@@ -146,23 +151,182 @@
     <script
         src="https://cdnjs.cloudflare.com/ajax/libs/highlightjs-line-numbers.js/2.8.0/highlightjs-line-numbers.min.js"></script>
 
+    <!-- 在base.html的</body>标签前添加以下脚本 -->
     <script>
-        document.addEventListener('DOMContentLoaded', (event) => {
-            // 高亮所有代码块
-            document.querySelectorAll('pre code').forEach((el) => {
-                hljs.highlightElement(el);
-                hljs.lineNumbersBlock(el);
+        // 全局AJAX导航功能
+        document.addEventListener('DOMContentLoaded', function () {
+            // 高亮和数学公式渲染函数
+            function renderContent() {
+                // 高亮所有代码块
+                document.querySelectorAll('pre code').forEach((el) => {
+                    hljs.highlightElement(el);
+                    hljs.lineNumbersBlock(el);
+                });
+
+                // 渲染数学公式
+                if (typeof renderMathInElement !== 'undefined') {
+                    renderMathInElement(document.body, {
+                        delimiters: [
+                            { left: "$", right: "$", display: true },
+                            { left: "\[", right: "\]", display: true },
+                            { left: "$", right: "$", display: false },
+                            { left: "\(", right: "\)", display: false }
+                        ],
+                        throwOnError: false
+                    });
+                }
+            }
+
+            // 初始渲染
+            renderContent();
+
+            // 加载指示器
+            const loadingBar = document.getElementById('loading-bar');
+            let loadingTimeout;
+
+            function startLoading() {
+                clearTimeout(loadingTimeout);
+                loadingBar.style.width = '30%';
+                loadingTimeout = setTimeout(() => {
+                    loadingBar.style.width = '70%';
+                }, 300);
+            }
+
+            function finishLoading() {
+                clearTimeout(loadingTimeout);
+                loadingBar.style.width = '100%';
+                setTimeout(() => {
+                    loadingBar.style.width = '0';
+                }, 300);
+            }
+
+            // 拦截所有站内链接点击
+            document.addEventListener('click', function (e) {
+                const link = e.target.closest('a');
+                if (!link) return;
+
+                // 排除外部链接、下载链接、新标签页打开等情况
+                if (link.hostname !== window.location.hostname ||
+                    link.target === '_blank' ||
+                    link.download ||
+                    link.getAttribute('data-no-ajax') === 'true' ||
+                    link.href === window.location.href) { // 防止点击当前页面链接
+                    return;
+                }
+
+                // 处理锚点链接
+                if (link.hash && link.pathname === window.location.pathname) {
+                    return; // 允许页面内锚点跳转
+                }
+
+                e.preventDefault();
+                navigateTo(link.href);
             });
 
-            // 新增KaTeX渲染配置 - 添加对多行公式的支持
-            renderMathInElement(document.body, {
-                delimiters: [
-                    { left: "$$", right: "$$", display: true },
-                    { left: "\\[", right: "\\]", display: true },
-                    { left: "$", right: "$", display: false },
-                    { left: "\\(", right: "\\)", display: false }
-                ],
-                throwOnError: false
+            // 处理浏览器前进后退
+            window.addEventListener('popstate', function (e) {
+                if (e.state && e.state.url) {
+                    loadPage(e.state.url, false);
+                }
+            });
+
+            // 导航函数
+            function navigateTo(url) {
+                history.pushState({ url: url }, '', url);
+                loadPage(url, true);
+            }
+
+            // 加载页面内容
+            function loadPage(url, updateHistory = true) {
+                startLoading();
+
+                // 添加ajax参数，告诉后端只返回内容片段
+                const separator = url.includes('?') ? '&' : '?';
+                const ajaxUrl = url + separator + 'ajax=1';
+
+                fetch(ajaxUrl, {
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                })
+                    .then(response => {
+                        if (!response.ok) {
+                            // 如果AJAX请求失败，回退到传统页面加载
+                            window.location.href = url;
+                            throw new Error('AJAX request failed');
+                        }
+                        return response.text();
+                    })
+                    .then(html => {
+                        // 使用更精确的方法提取内容
+                        const contentMatch = html.match(/<main\s+[^>]*id="main-content"[^>]*>([\s\S]*?)<\/main>/i);
+
+                        if (contentMatch && contentMatch[1]) {
+                            // 替换主内容区域
+                            document.getElementById('main-content').innerHTML = contentMatch[1];
+
+                            // 更新页面标题
+                            const titleMatch = html.match(/<title>([\s\S]*?)<\/title>/i);
+                            if (titleMatch && titleMatch[1]) {
+                                document.title = titleMatch[1];
+                            }
+
+                            // 滚动到顶部
+                            window.scrollTo(0, 0);
+
+                            // 重新渲染代码高亮和数学公式
+                            setTimeout(renderContent, 100);
+
+                            // 重新绑定事件（如果有的话）
+                            if (typeof bindEvents === 'function') {
+                                setTimeout(bindEvents, 150);
+                            }
+                        } else {
+                            // 如果没有找到内容，回退到传统页面加载
+                            window.location.href = url;
+                        }
+
+                        finishLoading();
+                    })
+                    .catch(error => {
+                        console.error('AJAX navigation error:', error);
+                        finishLoading();
+                    });
+            }
+
+            // 全局事件绑定函数（可以在各个页面中定义）
+            window.bindEvents = function () {
+                // 这里可以绑定页面特定的事件
+                console.log('Binding page-specific events');
+            };
+        });
+    </script>
+    <script>
+        // 在页面底部添加切换逻辑
+        document.addEventListener('DOMContentLoaded', function () {
+            const bgToggle = document.getElementById('bgToggle');
+            if (!bgToggle) return;
+
+            // 初始化按钮状态
+            bgToggle.checked = localStorage.getItem('bgState') !== 'off';
+
+            // 切换事件
+            bgToggle.addEventListener('change', function () {
+                const isOn = this.checked;
+
+                // 更新CSS变量
+                document.documentElement.style.setProperty(
+                    '--bg-display',
+                    isOn ? 'block' : 'none'
+                );
+
+                document.documentElement.style.setProperty(
+                    '--body-bg',
+                    isOn ? 'none' : '#efefef'
+                );
+
+                // 保存状态
+                localStorage.setItem('bgState', isOn ? 'on' : 'off');
             });
         });
     </script>
