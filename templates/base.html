@@ -233,10 +233,10 @@
                 if (typeof renderMathInElement !== 'undefined') {
                     renderMathInElement(document.body, {
                         delimiters: [
-                            { left: "$", right: "$", display: true },
-                            { left: "\[", right: "\]", display: true },
-                            { left: "$", right: "$", display: false },
-                            { left: "\(", right: "\)", display: false }
+                            { left: "$", right: "$", display: true },  // 双美元符号用于行间公式
+                            { left: "$", right: "$", display: false },   // 单美元符号用于行内公式
+                            { left: "\\[", right: "\\]", display: true }, // LaTeX 风格行间公式
+                            { left: "\\(", right: "\\)", display: false } // LaTeX 风格行内公式
                         ],
                         throwOnError: false
                     });
@@ -349,9 +349,11 @@
                     })
                     .then(html => {
                         // 使用更精确的方法提取内容
-                        const contentMatch = html.match(/<main\s+[^>]*id="main-content"[^>]*>([\s\S]*?)<\/main>/i);
-
-                        if (contentMatch && contentMatch[1]) {
+                        const parser = new DOMParser();
+                        const doc = parser.parseFromString(html, 'text/html');
+                        const newContent = doc.getElementById('main-content');
+                        
+                        if (newContent) {
                             // 在替换内容前，先恢复默认的过渡消息
                             const messageElement = document.querySelector('.transition-content p');
                             if (messageElement) {
@@ -359,7 +361,7 @@
                             }
 
                             // 替换主内容区域
-                            document.getElementById('main-content').innerHTML = contentMatch[1];
+                            document.getElementById('main-content').innerHTML = newContent.innerHTML;
 
                             // 更新页面标题
                             const titleMatch = html.match(/<title>([\s\S]*?)<\/title>/i);
@@ -401,35 +403,6 @@
                 // 这里可以绑定页面特定的事件
                 console.log('Binding page-specific events');
             };
-        });
-    </script>
-    <script>
-        // 在页面底部添加切换逻辑
-        document.addEventListener('DOMContentLoaded', function () {
-            const bgToggle = document.getElementById('bgToggle');
-            if (!bgToggle) return;
-
-            // 初始化按钮状态
-            bgToggle.checked = localStorage.getItem('bgState') !== 'off';
-
-            // 切换事件
-            bgToggle.addEventListener('change', function () {
-                const isOn = this.checked;
-
-                // 更新CSS变量
-                document.documentElement.style.setProperty(
-                    '--bg-display',
-                    isOn ? 'block' : 'none'
-                );
-
-                document.documentElement.style.setProperty(
-                    '--body-bg',
-                    isOn ? 'none' : '#efefef'
-                );
-
-                // 保存状态
-                localStorage.setItem('bgState', isOn ? 'on' : 'off');
-            });
         });
     </script>
     <script>
