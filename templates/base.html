@@ -348,47 +348,16 @@
                         return response.text();
                     })
                     .then(html => {
-                        // 使用更精确的方法提取内容
-                        const parser = new DOMParser();
-                        const doc = parser.parseFromString(html, 'text/html');
-                        const newContent = doc.getElementById('main-content');
-                        
-                        if (newContent) {
-                            // 在替换内容前，先恢复默认的过渡消息
-                            const messageElement = document.querySelector('.transition-content p');
-                            if (messageElement) {
-                                messageElement.textContent = '星之所向 创想无界';
-                            }
+                        // 直接替换整个页面内容
+                        document.open();
+                        document.write(html);
+                        document.close();
 
-                            // 替换主内容区域
-                            document.getElementById('main-content').innerHTML = newContent.innerHTML;
+                        // 标记加载完成
+                        finishLoading();
 
-                            // 更新页面标题
-                            const titleMatch = html.match(/<title>([\s\S]*?)<\/title>/i);
-                            if (titleMatch && titleMatch[1]) {
-                                document.title = titleMatch[1];
-                            }
-
-                            // 滚动到顶部
-                            window.scrollTo(0, 0);
-
-                            // 重新渲染代码高亮和数学公式
-                            setTimeout(renderContent, 100);
-
-                            // 重新绑定事件（如果有的话）
-                            if (typeof bindEvents === 'function') {
-                                setTimeout(bindEvents, 150);
-                            }
-
-                            // 标记加载完成
-                            finishLoading();
-
-                            // 完成过渡（等待渲染完成）
-                            completeTransition();
-                        } else {
-                            window.location.href = url;
-                            return Promise.reject('No content found');
-                        }
+                        // 完成过渡（等待渲染完成）
+                        completeTransition();
                     })
                     .catch(error => {
                         console.error('AJAX navigation error:', error);

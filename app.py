@@ -259,7 +259,7 @@ def index():
     
     # 检查是否是 AJAX 请求
     if request.args.get('ajax') == '1':
-        # 返回页面内容片段
+        # 对于 AJAX 请求，返回完整页面
         return render_template('index.html', 
                              posts=posts,
                              welcome_html=welcome_html)
@@ -303,7 +303,7 @@ def category(category):
     
     # 检查是否是 AJAX 请求
     if request.args.get('ajax') == '1':
-        # 返回页面内容片段
+        # 对于 AJAX 请求，返回完整页面
         return render_template('discuss.html', 
                              posts=posts, 
                              categories=categories, 
@@ -327,7 +327,7 @@ def show_post(post_id):
     
     # 检查是否是 AJAX 请求
     if request.args.get('ajax') == '1':
-        # 返回页面内容片段
+        # 对于 AJAX 请求，返回完整页面
         return render_template('post.html', post=post, content=safe_content)
     
     return render_template('post.html', post=post, content=safe_content)
@@ -340,7 +340,7 @@ def user_list():
     
     # 检查是否是 AJAX 请求
     if request.args.get('ajax') == '1':
-        # 返回页面内容片段
+        # 对于 AJAX 请求，返回完整页面
         return render_template('user_list.html', users=users)
     
     return render_template('user_list.html', users=users)
@@ -355,7 +355,7 @@ def user_detail(uid):
     
     # 检查是否是 AJAX 请求
     if request.args.get('ajax') == '1':
-        # 返回页面内容片段
+        # 对于 AJAX 请求，返回完整页面
         return render_template('user_detail.html', 
                              user=user,
                              posts=posts)
@@ -388,7 +388,7 @@ def discuss():
     
     # 检查是否是 AJAX 请求
     if request.args.get('ajax') == '1':
-        # 返回页面内容片段
+        # 对于 AJAX 请求，返回完整页面
         return render_template('discuss.html', 
                              posts=posts, 
                              categories=categories, 
